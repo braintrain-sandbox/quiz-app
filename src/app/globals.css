@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 249, 250, 251;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom styles */
+.quiz-card {
+  @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow;
+}
+
+.btn-primary {
+  @apply bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors;
+}
+
+.progress-bar {
+  @apply h-2 bg-primary-600 rounded-full transition-all duration-300;
+}
+
+.locked-card {
+  @apply opacity-60 cursor-not-allowed relative;
+}
+
+.locked-card::after {
+  content: '🔒';
+  @apply absolute top-4 right-4 text-2xl;
+}

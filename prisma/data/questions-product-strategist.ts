@@ -1,0 +1,150 @@
+// AI Product & Automation Strategist - Comprehensive MCQ Dataset
+
+export const productStrategistQuestions = [
+  // Topic 3-1: AI Product Lifecycle Management
+  {
+    topicId: "topic-3-1",
+    courseId: "course-3",
+    question: "What are the main stages of the AI product lifecycle?",
+    optionA: "Design, Build, Launch",
+    optionB: "Discovery, Development, Deployment, Monitoring, Iteration",
+    optionC: "Planning, Execution, Review",
+    optionD: "Ideation, Validation, Scaling",
+    correctAnswer: "B",
+    explanation: "The AI product lifecycle includes Discovery (problem identification), Development (building solution), Deployment (launch), Monitoring (performance tracking), and Iteration (continuous improvement).",
+    difficulty: "MEDIUM",
+    tags: ["product lifecycle", "AI product", "stages"]
+  },
+  {
+    topicId: "topic-3-1",
+    courseId: "course-3",
+    question: "What is product-market fit?",
+    optionA: "When product fits in the market",
+    optionB: "When a product satisfies strong market demand and customers are willing to pay",
+    optionC: "When marketing approves the product",
+    optionD: "When product matches competitors",
+    correctAnswer: "B",
+    explanation: "Product-market fit occurs when a product successfully satisfies strong market demand, evidenced by strong user adoption, retention, and willingness to pay.",
+    difficulty: "EASY",
+    tags: ["product-market fit", "validation", "metrics"]
+  },
+  {
+    topicId: "topic-3-1",
+    courseId: "course-3",
+    question: "What is an MVP (Minimum Viable Product)?",
+    optionA: "Most Valuable Player",
+    optionB: "A product with minimum features needed to test core hypothesis and gather feedback",
+    optionC: "A minimal viable price",
+    optionD: "Maximum value proposition",
+    correctAnswer: "B",
+    explanation: "An MVP is a version of a product with just enough features to test the core hypothesis, gather maximum validated learning about customers with least effort.",
+    difficulty: "EASY",
+    tags: ["MVP", "product development", "lean startup"]
+  },
+  {
+    topicId: "topic-3-2",
+    courseId: "course-3",
+    question: "What is workflow automation?",
+    optionA: "Automating employee workflows",
+    optionB: "Using technology to automate repetitive tasks and business processes",
+    optionC: "Workflow documentation",
+    optionD: "Work scheduling",
+    correctAnswer: "B",
+    explanation: "Workflow automation uses technology to execute recurring tasks and processes automatically according to defined business rules, reducing manual effort and errors.",
+    difficulty: "EASY",
+    tags: ["automation", "workflows", "efficiency"]
+  },
+  {
+    topicId: "topic-3-3",
+    courseId: "course-3",
+    question: "What is the main advantage of no-code platforms?",
+    optionA: "They require no planning",
+    optionB: "They enable non-technical users to build applications without writing code",
+    optionC: "They are always free",
+    optionD: "They work without internet",
+    correctAnswer: "B",
+    explanation: "No-code platforms provide visual interfaces and pre-built components allowing non-technical users to create applications through drag-and-drop and configuration, democratizing development.",
+    difficulty: "EASY",
+    tags: ["no-code", "platforms", "accessibility"]
+  },
+  {
+    topicId: "topic-3-4",
+    courseId: "course-3",
+    question: "What is prompt engineering?",
+    optionA: "Engineering prompts for websites",
+    optionB: "Crafting effective instructions to get desired outputs from AI language models",
+    optionC: "Creating notification systems",
+    optionD: "Engineering quick responses",
+    correctAnswer: "B",
+    explanation: "Prompt engineering is the practice of designing and refining input prompts to effectively communicate with and get optimal outputs from AI language models like GPT.",
+    difficulty: "EASY",
+    tags: ["prompt engineering", "AI", "LLMs"]
+  },
+  {
+    topicId: "topic-3-4",
+    courseId: "course-3",
+    question: "What is chain-of-thought prompting?",
+    optionA: "Chaining multiple prompts",
+    optionB: "Asking AI to show its reasoning step-by-step before giving an answer",
+    optionC: "Blockchain-based prompting",
+    optionD: "Sequential questioning",
+    correctAnswer: "B",
+    explanation: "Chain-of-thought prompting explicitly asks the AI model to show its reasoning process step-by-step, significantly improving performance on complex reasoning tasks.",
+    difficulty: "MEDIUM",
+    tags: ["chain-of-thought", "prompting", "reasoning"]
+  },
+  {
+    topicId: "topic-3-5",
+    courseId: "course-3",
+    question: "What is microservices architecture?",
+    optionA: "Small service businesses",
+    optionB: "An architectural style structuring an application as collection of loosely coupled services",
+    optionC: "Micro-transactions",
+    optionD: "Minimal service offering",
+    correctAnswer: "B",
+    explanation: "Microservices architecture structures applications as collections of loosely coupled, independently deployable services, each focused on specific business capabilities.",
+    difficulty: "MEDIUM",
+    tags: ["microservices", "architecture", "design"]
+  },
+  {
+    topicId: "topic-3-6",
+    courseId: "course-3",
+    question: "What is a freemium pricing model?",
+    optionA: "Everything is free",
+    optionB: "Basic features free; advanced features require payment",
+    optionC: "Premium features are free",
+    optionD: "Free for limited time only",
+    correctAnswer: "B",
+    explanation: "Freemium offers basic features for free while charging for premium features, upgrades, or additional capacity, converting free users to paying customers over time.",
+    difficulty: "EASY",
+    tags: ["freemium", "pricing", "monetization"]
+  },
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "What is multi-tenancy in SaaS?",
+    optionA: "Multiple rental properties",
+    optionB: "A single instance of software serving multiple customers with isolated data",
+    optionC: "Multiple software versions",
+    optionD: "Multi-user access",
+    correctAnswer: "B",
+    explanation: "Multi-tenancy allows a single software instance to serve multiple customers (tenants), with each tenant's data isolated and invisible to others, improving resource efficiency.",
+    difficulty: "MEDIUM",
+    tags: ["multi-tenancy", "SaaS", "architecture"]
+  },
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "What is GDPR?",
+    optionA: "General Data Protection Regulation",
+    optionB: "Global Development Privacy Rules",
+    optionC: "Guaranteed Data Privacy Rights",
+    optionD: "General Database Protection Requirements",
+    correctAnswer: "A",
+    explanation: "GDPR (General Data Protection Regulation) is a comprehensive EU regulation governing data protection and privacy, imposing strict requirements on how organizations handle personal data.",
+    difficulty: "EASY",
+    tags: ["GDPR", "compliance", "privacy"]
+  },
+];
+
+export default productStrategistQuestions;
