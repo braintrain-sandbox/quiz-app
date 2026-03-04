@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function HomePage() {
+  const { data: session } = useSession();
+
   return (
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
@@ -16,9 +21,16 @@ export default function HomePage() {
           <Link href="/courses" className="btn-primary text-lg px-8 py-3">
             Explore Courses
           </Link>
-          <Link href="/auth/signup" className="btn-secondary text-lg px-8 py-3">
-            Get Started Free
-          </Link>
+          {!session && (
+            <Link href="/auth/signup" className="btn-secondary text-lg px-8 py-3">
+              Get Started Free
+            </Link>
+          )}
+          {session && (
+            <Link href="/dashboard" className="btn-secondary text-lg px-8 py-3">
+              Go to Dashboard
+            </Link>
+          )}
         </div>
       </section>
 
@@ -148,13 +160,15 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="text-center bg-primary-600 text-white rounded-lg p-12">
-        <h2 className="text-3xl font-bold mb-4">Ready to Start Your AI Career?</h2>
-        <p className="text-xl mb-6">Join thousands learning AI skills through our quiz platform</p>
-        <Link href="/auth/signup" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
-          Sign Up Now - It's Free
-        </Link>
-      </section>
+      {!session && (
+        <section className="text-center bg-primary-600 text-white rounded-lg p-12">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Your AI Career?</h2>
+          <p className="text-xl mb-6">Join thousands learning AI skills through our quiz platform</p>
+          <Link href="/auth/signup" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
+            Sign Up Now - It's Free
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

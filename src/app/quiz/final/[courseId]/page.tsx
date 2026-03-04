@@ -33,7 +33,7 @@ export default function FinalQuizPage() {
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
 
-  const { currentQuiz, currentQuestionIndex, answers, markedForReview } = useSelector(
+  const { currentQuiz } = useSelector(
     (state: RootState) => state.quiz
   );
 
@@ -57,13 +57,13 @@ export default function FinalQuizPage() {
 
   useEffect(() => {
     // Timer
-    if (currentQuiz && !showResults) {
+    if (currentQuiz && !showResults && !submitting) {
       const interval = setInterval(() => {
         setTimeElapsed((prev) => prev + 1);
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [currentQuiz, showResults]);
+  }, [currentQuiz, showResults, submitting]);
 
   const fetchFinalQuiz = async () => {
     try {
@@ -91,32 +91,34 @@ export default function FinalQuizPage() {
     }
   };
 
-  const handleAnswer = (optionKey: string) => {
+  const handleAnswer = (questionId: string, optionKey: string) => {
     if (currentQuiz) {
-      dispatch(answerQuestion({ questionIndex: currentQuestionIndex, answer: optionKey }));
+      dispatch(answerQuestion({ questionId, answer: optionKey }));
     }
   };
 
   const handleMarkReview = () => {
-    dispatch(markForReview(currentQuestionIndex));
+    if (currentQuiz) {
+      dispatch(markForReview(currentQuiz.currentQuestionIndex));
+    }
   };
 
   const handleNext = () => {
-    if (currentQuiz && currentQuestionIndex < currentQuiz.questions.length - 1) {
-      dispatch(setCurrentQuestion(currentQuestionIndex + 1));
+    if (currentQuiz && currentQuiz.currentQuestionIndex < currentQuiz.questions.length - 1) {
+      dispatch(setCurrentQuestion(currentQuiz.currentQuestionIndex + 1));
     }
   };
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      dispatch(setCurrentQuestion(currentQuestionIndex - 1));
+    if (currentQuiz && currentQuiz.currentQuestionIndex > 0) {
+      dispatch(setCurrentQuestion(currentQuiz.currentQuestionIndex - 1));
     }
   };
 
   const handleSubmit = async () => {
     if (!currentQuiz) return;
 
-    const unansweredCount = currentQuiz.questions.length - Object.keys(answers).length;
+    const unansweredCount = currentQuiz.questions.length - Object.keys(currentQuiz.answers).length;
     
     if (unansweredCount > 0) {
       const confirmSubmit = window.confirm(
@@ -134,7 +136,7 @@ export default function FinalQuizPage() {
         body: JSON.stringify({
           courseId,
           topicId: null, // Final quiz
-          answers,
+          answers: currentQuiz.answers,
           timeTaken: timeElapsed,
         }),
       });
@@ -152,8 +154,8 @@ export default function FinalQuizPage() {
         timeTaken: timeElapsed,
         passed: result.passed,
         certificateId: result.certificateId,
-        answers,
-        questions: currentQuiz.questions,
+        answers: currentQuiz.answers,
+        questions: result.questions || currentQuiz.questions,
       };
 
       setResults(finalResult);
@@ -330,9 +332,9 @@ export default function FinalQuizPage() {
     );
   }
 
-  const currentQuestion = currentQuiz.questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
-  const answeredCount = Object.keys(answers).length;
+  const currentQuestion = currentQuiz.questions[currentQuiz.currentQuestionIndex];
+  const progress = ((currentQuiz.currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
+  const answeredCount = Object.keys(currentQuiz.answers).length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -354,7 +356,7 @@ export default function FinalQuizPage() {
           <div className="mb-2">
             <div className="flex justify-between text-sm text-gray-600 mb-1">
               <span>
-                Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}
+                Question {currentQuiz.currentQuestionIndex + 1} of {currentQuiz.questions.length}
               </span>
               <span>
                 Answered: {answeredCount}/{currentQuiz.questions.length}
@@ -376,7 +378,7 @@ export default function FinalQuizPage() {
                   <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
                     {currentQuestion.difficulty}
                   </span>
-                  {markedForReview.includes(currentQuestionIndex) && (
+                  {currentQuiz.markedForReview.includes(currentQuiz.currentQuestionIndex) && (
                     <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
                       ⭐ Marked
                     </span>
@@ -388,13 +390,13 @@ export default function FinalQuizPage() {
               {/* Options */}
               <div className="space-y-3 mb-6">
                 {(['A', 'B', 'C', 'D'] as const).map((key) => {
-                  const optionKey = `option${key}` as keyof Question;
-                  const isSelected = answers[currentQuestionIndex] === key;
+                  const optionKey = `option${key}` as 'optionA' | 'optionB' | 'optionC' | 'optionD';
+                  const isSelected = currentQuiz.answers[currentQuestion.id] === key;
 
                   return (
                     <button
                       key={key}
-                      onClick={() => handleAnswer(key)}
+                      onClick={() => handleAnswer(currentQuestion.id, key)}
                       className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                         isSelected
                           ? 'border-primary-500 bg-primary-50'
@@ -413,23 +415,23 @@ export default function FinalQuizPage() {
                 <button
                   onClick={handleMarkReview}
                   className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                    markedForReview.includes(currentQuestionIndex)
+                    currentQuiz.markedForReview.includes(currentQuiz.currentQuestionIndex)
                       ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
                       : 'border-gray-300 hover:border-yellow-400'
                   }`}
                 >
-                  {markedForReview.includes(currentQuestionIndex) ? '⭐ Marked' : '⭐ Mark for Review'}
+                  {currentQuiz.markedForReview.includes(currentQuiz.currentQuestionIndex) ? '⭐ Marked' : '⭐ Mark for Review'}
                 </button>
 
                 <div className="flex gap-2">
                   <button
                     onClick={handlePrevious}
-                    disabled={currentQuestionIndex === 0}
+                    disabled={currentQuiz.currentQuestionIndex === 0}
                     className="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                   >
                     Previous
                   </button>
-                  {currentQuestionIndex === currentQuiz.questions.length - 1 ? (
+                  {currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1 ? (
                     <button
                       onClick={handleSubmit}
                       disabled={submitting}
@@ -455,10 +457,10 @@ export default function FinalQuizPage() {
             <div className="quiz-card sticky top-4">
               <h3 className="font-semibold mb-3">Question Navigator</h3>
               <div className="grid grid-cols-5 gap-2">
-                {currentQuiz.questions.map((_, index) => {
-                  const isAnswered = answers[index] !== undefined;
-                  const isMarked = markedForReview.includes(index);
-                  const isCurrent = index === currentQuestionIndex;
+                {currentQuiz.questions.map((q, index) => {
+                  const isAnswered = currentQuiz.answers[q.id] !== undefined;
+                  const isMarked = currentQuiz.markedForReview.includes(index);
+                  const isCurrent = index === currentQuiz.currentQuestionIndex;
 
                   return (
                     <button

@@ -34,14 +34,18 @@ export default function QuizPage() {
     }
 
     fetchQuizQuestions();
-
-    // Timer
-    const timer = setInterval(() => {
-      setTimeElapsed((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, [params.topicId, session]);
+
+  useEffect(() => {
+    // Timer - stops when submitting or showing results
+    if (!submitting && !showResults) {
+      const timer = setInterval(() => {
+        setTimeElapsed((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [submitting, showResults]);
 
   const fetchQuizQuestions = async () => {
     try {
@@ -309,7 +313,8 @@ export default function QuizPage() {
         {/* Options */}
         <div className="space-y-3">
           {['A', 'B', 'C', 'D'].map((option) => {
-            const optionText = currentQuestion[`option${option}` as keyof Question] as string;
+            const optionKey = `option${option}` as 'optionA' | 'optionB' | 'optionC' | 'optionD';
+            const optionText = currentQuestion[optionKey] as string;
             const isSelected = currentQuiz.answers[currentQuestion.id] === option;
 
             return (
