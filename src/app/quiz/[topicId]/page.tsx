@@ -114,6 +114,7 @@ export default function QuizPage() {
           answers: currentQuiz.answers,
           timeTaken: timeElapsed,
           isFinalQuiz: false,
+          questionIds: currentQuiz.questions.map((q) => q.id),
         }),
       });
 

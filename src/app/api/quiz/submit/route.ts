@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { topicId, courseId, answers, timeTaken, isFinalQuiz } = body;
+    const { topicId, courseId, answers, timeTaken, isFinalQuiz, questionIds } = body;
 
     // Get questions to calculate score
     let questions;
@@ -53,6 +53,15 @@ export async function POST(request: Request) {
         explanation: q.explanation,
       };
     });
+
+    // Sort results to match the order questions were presented to the user
+    if (questionIds && Array.isArray(questionIds)) {
+      questionResults.sort((a, b) => {
+        const indexA = questionIds.indexOf(a.questionId);
+        const indexB = questionIds.indexOf(b.questionId);
+        return indexA - indexB;
+      });
+    }
 
     const totalQuestions = questions.length;
     const score = (correctAnswers / totalQuestions) * 100;

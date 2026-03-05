@@ -138,6 +138,8 @@ export default function FinalQuizPage() {
           topicId: null, // Final quiz
           answers: currentQuiz.answers,
           timeTaken: timeElapsed,
+          isFinalQuiz: true,
+          questionIds: currentQuiz.questions.map((q) => q.id),
         }),
       });
 
