@@ -43,6 +43,7 @@ export default function FinalQuizPage() {
   const [results, setResults] = useState<FinalQuizResult | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [courseName, setCourseName] = useState('');
+  const [currentResultIndex, setCurrentResultIndex] = useState(0);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -54,6 +55,22 @@ export default function FinalQuizPage() {
       fetchFinalQuiz();
     }
   }, [status, courseId]);
+
+  // Keyboard navigation for results
+  useEffect(() => {
+    if (!showResults || !results) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentResultIndex(prev => Math.max(0, prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentResultIndex(prev => Math.min(results.questions.length - 1, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showResults, results]);
 
   useEffect(() => {
     // Timer
@@ -199,127 +216,256 @@ export default function FinalQuizPage() {
   }
 
   if (showResults && results) {
+    const currentQuestion = results.questions[currentResultIndex];
+    const userAnswer = results.answers[currentResultIndex];
+    const isCorrect = userAnswer === currentQuestion.correctAnswer;
+    const totalQuestions = results.questions.length;
+
+    const getOptionClass = (optionKey: string) => {
+      const isUserAnswer = userAnswer === optionKey;
+      const isCorrectAnswer = currentQuestion.correctAnswer === optionKey;
+      
+      if (isCorrectAnswer && isUserAnswer) {
+        return 'bg-green-100 border-2 border-green-500 font-semibold';
+      }
+      if (isCorrectAnswer) {
+        return 'bg-green-100 border-2 border-green-400 font-semibold';
+      }
+      if (isUserAnswer) {
+        return 'bg-red-100 border-2 border-red-500 font-semibold';
+      }
+      return 'bg-gray-50 border border-gray-200';
+    };
+
+    const getOptionIcon = (optionKey: string) => {
+      const isUserAnswer = userAnswer === optionKey;
+      const isCorrectAnswer = currentQuestion.correctAnswer === optionKey;
+      
+      if (isCorrectAnswer) {
+        return '✓';
+      }
+      if (isUserAnswer && !isCorrectAnswer) {
+        return '✗';
+      }
+      return '';
+    };
+
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Final Quiz Results</h1>
-            <div className="text-xl text-gray-600">{courseName}</div>
-          </div>
+      <div className="container mx-auto px-4 py-12 max-w-7xl">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold mb-4">Final Quiz Results</h1>
+          <div className="text-xl text-gray-600">{courseName}</div>
+        </div>
 
-          {/* Score Card */}
-          <div className={`quiz-card mb-8 ${results.passed ? 'bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-500' : 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-500'}`}>
-            <div className="text-center">
-              <div className="text-6xl font-bold mb-4" style={{ color: results.passed ? '#10b981' : '#f59e0b' }}>
-                {results.score.toFixed(1)}%
-              </div>
-              <div className="text-2xl font-semibold mb-4">
-                {results.passed ? '🎉 Congratulations! You Passed!' : '📚 Keep Learning!'}
-              </div>
-              <div className="flex justify-center gap-8 text-lg mb-4">
-                <div>
-                  <span className="font-semibold">Correct:</span> {results.correctAnswers}/{results.totalQuestions}
-                </div>
-                <div>
-                  <span className="font-semibold">Time:</span> {formatTime(results.timeTaken)}
-                </div>
-              </div>
-
-              {results.passed && results.certificateId && (
-                <div className="mt-6 p-6 bg-white rounded-lg border-2 border-green-500">
-                  <div className="text-2xl mb-3">🏆</div>
-                  <div className="text-xl font-semibold text-green-700 mb-2">Certificate Earned!</div>
-                  <div className="text-sm text-gray-600 mb-3">Certificate ID: {results.certificateId}</div>
-                  <p className="text-sm text-gray-700">
-                    Your certificate has been generated and saved to your account. View it in your dashboard.
-                  </p>
-                </div>
-              )}
-
-              {!results.passed && (
-                <div className="mt-4 p-4 bg-white rounded-lg">
-                  <p className="text-gray-700">
-                    You need at least 70% to pass and earn a certificate. Review your answers and try again!
-                  </p>
-                </div>
-              )}
+        {/* Score Card */}
+        <div className={`quiz-card mb-6 ${results.passed ? 'bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-500' : 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-500'}`}>
+          <div className="text-center">
+            <div className="text-6xl font-bold mb-4" style={{ color: results.passed ? '#10b981' : '#f59e0b' }}>
+              {results.score.toFixed(1)}%
             </div>
+            <div className="text-2xl font-semibold mb-4">
+              {results.passed ? '🎉 Congratulations! You Passed!' : '📚 Keep Learning!'}
+            </div>
+            <div className="flex justify-center gap-8 text-lg mb-4">
+              <div>
+                <span className="font-semibold">Correct:</span> {results.correctAnswers}/{results.totalQuestions}
+              </div>
+              <div>
+                <span className="font-semibold">Time:</span> {formatTime(results.timeTaken)}
+              </div>
+            </div>
+
+            {results.passed && results.certificateId && (
+              <div className="mt-6 p-6 bg-white rounded-lg border-2 border-green-500">
+                <div className="text-2xl mb-3">🏆</div>
+                <div className="text-xl font-semibold text-green-700 mb-2">Certificate Earned!</div>
+                <div className="text-sm text-gray-600 mb-3">Certificate ID: {results.certificateId}</div>
+                <p className="text-sm text-gray-700">
+                  Your certificate has been generated and saved to your account. View it in your dashboard.
+                </p>
+              </div>
+            )}
+
+            {!results.passed && (
+              <div className="mt-4 p-4 bg-white rounded-lg">
+                <p className="text-gray-700">
+                  You need at least 70% to pass and earn a certificate. Review your answers and try again!
+                </p>
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Detailed Results */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Detailed Results</h2>
-            <div className="space-y-4">
+        {/* Results Review Section */}
+        <div className="flex gap-6">
+          {/* Question Navigator Grid */}
+          <div className="quiz-card w-64 flex-shrink-0">
+            <h3 className="font-semibold mb-3 text-sm">Questions</h3>
+            <div className="grid grid-cols-5 gap-2 max-h-[500px] overflow-y-auto">
               {results.questions.map((question, index) => {
-                const userAnswer = results.answers[index];
-                const isCorrect = userAnswer === question.correctAnswer;
-
+                const qUserAnswer = results.answers[index];
+                const qIsCorrect = qUserAnswer === question.correctAnswer;
+                
                 return (
-                  <div
+                  <button
                     key={question.id}
-                    className={`quiz-card ${isCorrect ? 'border-l-4 border-green-500 bg-green-50' : 'border-l-4 border-red-500 bg-red-50'}`}
+                    onClick={() => setCurrentResultIndex(index)}
+                    className={`
+                      w-10 h-10 rounded flex items-center justify-center text-sm font-semibold
+                      transition-all border-2
+                      ${currentResultIndex === index 
+                        ? 'ring-2 ring-blue-400 ring-offset-2' 
+                        : ''
+                      }
+                      ${qIsCorrect
+                        ? 'bg-green-100 border-green-500 text-green-700 hover:bg-green-200'
+                        : qUserAnswer
+                        ? 'bg-red-100 border-red-500 text-red-700 hover:bg-red-200'
+                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:bg-gray-200'
+                      }
+                    `}
+                    title={qIsCorrect ? 'Correct' : qUserAnswer ? 'Incorrect' : 'Not answered'}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl">{isCorrect ? '✅' : '❌'}</div>
-                      <div className="flex-1">
-                        <div className="font-semibold mb-2">
-                          Question {index + 1}: {question.question}
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-2 mb-3">
-                          {(['A', 'B', 'C', 'D'] as const).map((key) => {
-                            const optionKey = `option${key}` as keyof Question;
-                            const isUserAnswer = userAnswer === key;
-                            const isCorrectAnswer = question.correctAnswer === key;
-
-                            return (
-                              <div
-                                key={key}
-                                className={`p-2 rounded text-sm ${
-                                  isCorrectAnswer
-                                    ? 'bg-green-200 font-semibold'
-                                    : isUserAnswer
-                                    ? 'bg-red-200'
-                                    : 'bg-white'
-                                }`}
-                              >
-                                {key}. {question[optionKey]}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        <div className="text-sm">
-                          <div className="mb-1">
-                            <span className="font-semibold">Your Answer:</span>{' '}
-                            {userAnswer || 'Not answered'}
-                          </div>
-                          <div className="mb-2">
-                            <span className="font-semibold">Correct Answer:</span>{' '}
-                            {question.correctAnswer}
-                          </div>
-                          <div className="text-gray-700 bg-white p-3 rounded">
-                            <span className="font-semibold">Explanation:</span> {question.explanation}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    {index + 1}
+                  </button>
                 );
               })}
             </div>
+            <div className="mt-4 text-xs space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-100 border-2 border-green-500 rounded"></div>
+                <span>Correct</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-100 border-2 border-red-500 rounded"></div>
+                <span>Incorrect</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-100 border-2 border-gray-400 rounded"></div>
+                <span>Skipped</span>
+              </div>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4">
-            <button onClick={handleBackToCourse} className="btn-primary">
-              Back to Dashboard
-            </button>
-            {!results.passed && (
-              <button onClick={handleRetake} className="btn-primary bg-yellow-600 hover:bg-yellow-700">
-                Retake Final Quiz
+          {/* Current Question Display */}
+          <div className="flex-1">
+            <div className={`p-5 rounded-lg border-l-4 shadow-sm mb-4 ${isCorrect ? 'bg-white border-green-500' : 'bg-white border-red-500'}`}>
+              <div className="flex items-start gap-3">
+                <div className="text-2xl flex-shrink-0">{isCorrect ? '✅' : '❌'}</div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="font-semibold text-lg">
+                      Question {currentResultIndex + 1} of {totalQuestions}
+                    </div>
+                    {currentQuestion.difficulty && (
+                      <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ml-2 ${
+                        currentQuestion.difficulty === 'EASY' ? 'bg-green-100 text-green-700' :
+                        currentQuestion.difficulty === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {currentQuestion.difficulty}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-lg mb-4">{currentQuestion.question}</p>
+
+                  {/* Answer Options */}
+                  <div className="grid gap-2 mb-4">
+                    {(['A', 'B', 'C', 'D'] as const).map((key) => {
+                      const optionKey = `option${key}` as keyof Question;
+                      const optionText = currentQuestion[optionKey];
+                      const icon = getOptionIcon(key);
+
+                      return (
+                        <div
+                          key={key}
+                          className={`p-3 rounded-lg transition-all ${getOptionClass(key)}`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="font-semibold flex-shrink-0">{key}.</span>
+                            <span className="flex-1">{optionText}</span>
+                            {icon && (
+                              <span className="flex-shrink-0 text-lg font-bold">
+                                {icon}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Answer Summary */}
+                  <div className="bg-gray-50 p-3 rounded-lg mb-3">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="font-semibold">Your Answer:</span>{' '}
+                        <span className={isCorrect ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
+                          {userAnswer || 'Not answered'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold">Correct Answer:</span>{' '}
+                        <span className="text-green-700 font-semibold">{currentQuestion.correctAnswer}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Explanation */}
+                  <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+                    <p className="text-sm">
+                      <span className="font-semibold text-blue-900">💡 Explanation:</span>
+                      <span className="text-gray-700 ml-1">{currentQuestion.explanation}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={() => setCurrentResultIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentResultIndex === 0}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ← Previous
               </button>
-            )}
+
+              <div className="text-center">
+                <span className="text-sm text-gray-600 block">
+                  Question {currentResultIndex + 1} of {totalQuestions}
+                </span>
+                <span className="text-xs text-gray-400">
+                  Use ← → arrow keys to navigate
+                </span>
+              </div>
+
+              <button
+                onClick={() => setCurrentResultIndex(prev => Math.min(totalQuestions - 1, prev + 1))}
+                disabled={currentResultIndex === totalQuestions - 1}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-4">
+              <button onClick={handleBackToCourse} className="btn-primary">
+                Back to Dashboard
+              </button>
+              {!results.passed && (
+                <button onClick={() => {
+                  handleRetake();
+                  setCurrentResultIndex(0);
+                }} className="btn-primary bg-yellow-600 hover:bg-yellow-700">
+                  Retake Final Quiz
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

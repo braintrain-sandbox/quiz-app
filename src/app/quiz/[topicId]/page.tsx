@@ -26,6 +26,7 @@ export default function QuizPage() {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [currentResultIndex, setCurrentResultIndex] = useState(0);
 
   useEffect(() => {
     if (!session) {
@@ -35,6 +36,22 @@ export default function QuizPage() {
 
     fetchQuizQuestions();
   }, [params.topicId, session]);
+
+  // Keyboard navigation for results
+  useEffect(() => {
+    if (!showResults || !results) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentResultIndex(prev => Math.max(0, prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentResultIndex(prev => Math.min(results.results.length - 1, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showResults, results]);
 
   useEffect(() => {
     // Timer - stops when submitting or showing results
@@ -155,14 +172,47 @@ export default function QuizPage() {
   }
 
   if (showResults && results) {
+    const currentResult = results.results[currentResultIndex];
+    const totalResults = results.results.length;
+
+    const getOptionClass = (optionKey: string) => {
+      const isUserAnswer = currentResult.userAnswer === optionKey;
+      const isCorrectAnswer = currentResult.correctAnswer === optionKey;
+      
+      if (isCorrectAnswer && isUserAnswer) {
+        return 'bg-green-100 border-2 border-green-500 font-semibold';
+      }
+      if (isCorrectAnswer) {
+        return 'bg-green-100 border-2 border-green-400 font-semibold';
+      }
+      if (isUserAnswer) {
+        return 'bg-red-100 border-2 border-red-500 font-semibold';
+      }
+      return 'bg-gray-50 border border-gray-200';
+    };
+
+    const getOptionIcon = (optionKey: string) => {
+      const isUserAnswer = currentResult.userAnswer === optionKey;
+      const isCorrectAnswer = currentResult.correctAnswer === optionKey;
+      
+      if (isCorrectAnswer) {
+        return '✓';
+      }
+      if (isUserAnswer && !isCorrectAnswer) {
+        return '✗';
+      }
+      return '';
+    };
+
     return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="quiz-card">
+      <div className="container mx-auto px-4 py-12 max-w-7xl">
+        {/* Header Stats */}
+        <div className="quiz-card mb-6">
           <h1 className="text-3xl font-bold mb-6 text-center">
             {results.passed ? '🎉 Congratulations!' : '📊 Quiz Complete'}
           </h1>
 
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="text-center p-4 bg-blue-50 rounded">
               <div className="text-3xl font-bold text-blue-600">{results.score.toFixed(1)}%</div>
               <div className="text-sm text-gray-600">Score</div>
@@ -180,77 +230,195 @@ export default function QuizPage() {
           </div>
 
           {results.passed ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-green-800 text-center font-semibold">
                 ✅ You passed! The next topic is now unlocked.
               </p>
             </div>
           ) : (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <p className="text-yellow-800 text-center">
                 You can retake this quiz to improve your score.
               </p>
             </div>
           )}
+        </div>
 
-          {/* Detailed Results */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Detailed Results</h2>
-            <div className="space-y-4">
+        {/* Results Review Section */}
+        <div className="flex gap-6">
+          {/* Question Navigator Grid */}
+          <div className="quiz-card w-64 flex-shrink-0">
+            <h3 className="font-semibold mb-3 text-sm">Questions</h3>
+            <div className="grid grid-cols-5 gap-2">
               {results.results.map((result: any, index: number) => (
-                <div
+                <button
                   key={result.questionId}
-                  className={`p-4 rounded-lg border-2 ${
-                    result.isCorrect
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
-                  }`}
+                  onClick={() => setCurrentResultIndex(index)}
+                  className={`
+                    w-10 h-10 rounded flex items-center justify-center text-sm font-semibold
+                    transition-all border-2
+                    ${currentResultIndex === index 
+                      ? 'ring-2 ring-blue-400 ring-offset-2' 
+                      : ''
+                    }
+                    ${result.isCorrect
+                      ? 'bg-green-100 border-green-500 text-green-700 hover:bg-green-200'
+                      : result.userAnswer
+                      ? 'bg-red-100 border-red-500 text-red-700 hover:bg-red-200'
+                      : 'bg-gray-100 border-gray-400 text-gray-700 hover:bg-gray-200'
+                    }
+                  `}
+                  title={result.isCorrect ? 'Correct' : result.userAnswer ? 'Incorrect' : 'Not answered'}
                 >
-                  <div className="flex items-start gap-3 mb-2">
-                    <span className="text-2xl">
-                      {result.isCorrect ? '✅' : '❌'}
-                    </span>
-                    <div className="flex-1">
-                      <p className="font-semibold mb-2">Q{index + 1}: {result.question}</p>
-                      <p className="text-sm mb-1">
-                        <span className="font-semibold">Your answer:</span>{' '}
-                        <span className={result.isCorrect ? 'text-green-700' : 'text-red-700'}>
-                          {result.userAnswer || 'Not answered'}
-                        </span>
-                      </p>
-                      {!result.isCorrect && (
-                        <p className="text-sm mb-1">
-                          <span className="font-semibold">Correct answer:</span>{' '}
-                          <span className="text-green-700">{result.correctAnswer}</span>
-                        </p>
-                      )}
-                      <p className="text-sm text-gray-700 mt-2">
-                        <span className="font-semibold">Explanation:</span> {result.explanation}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  {index + 1}
+                </button>
               ))}
+            </div>
+            <div className="mt-4 text-xs space-y-1">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-100 border-2 border-green-500 rounded"></div>
+                <span>Correct</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-100 border-2 border-red-500 rounded"></div>
+                <span>Incorrect</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-100 border-2 border-gray-400 rounded"></div>
+                <span>Skipped</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="btn-primary"
-            >
-              Back to Course
-            </button>
-            <button
-              onClick={() => {
-                setShowResults(false);
-                fetchQuizQuestions();
-                setTimeElapsed(0);
-              }}
-              className="btn-secondary"
-            >
-              Retake Quiz
-            </button>
+          {/* Current Question Display */}
+          <div className="flex-1">
+            <div className={`p-5 rounded-lg border-l-4 shadow-sm mb-4 ${
+              currentResult.isCorrect
+                ? 'bg-white border-green-500'
+                : 'bg-white border-red-500'
+            }`}>
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-2xl flex-shrink-0">
+                  {currentResult.isCorrect ? '✅' : '❌'}
+                </span>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <p className="font-semibold text-lg">
+                      Question {currentResultIndex + 1} of {totalResults}
+                    </p>
+                    {currentResult.difficulty && (
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        currentResult.difficulty === 'EASY' ? 'bg-green-100 text-green-700' :
+                        currentResult.difficulty === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {currentResult.difficulty}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-lg mb-4">{currentResult.question}</p>
+                  
+                  {/* Answer Options */}
+                  <div className="grid gap-2 mb-4">
+                    {['A', 'B', 'C', 'D'].map((optionKey) => {
+                      const optionText = currentResult[`option${optionKey}`];
+                      const icon = getOptionIcon(optionKey);
+                      
+                      return (
+                        <div
+                          key={optionKey}
+                          className={`p-3 rounded-lg transition-all ${getOptionClass(optionKey)}`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="font-semibold flex-shrink-0">{optionKey}.</span>
+                            <span className="flex-1">{optionText}</span>
+                            {icon && (
+                              <span className="flex-shrink-0 text-lg font-bold">
+                                {icon}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Answer Summary */}
+                  <div className="bg-gray-50 p-3 rounded-lg mb-3">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="font-semibold">Your Answer:</span>{' '}
+                        <span className={currentResult.isCorrect ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
+                          {currentResult.userAnswer || 'Not answered'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold">Correct Answer:</span>{' '}
+                        <span className="text-green-700 font-semibold">{currentResult.correctAnswer}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Explanation */}
+                  <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+                    <p className="text-sm">
+                      <span className="font-semibold text-blue-900">💡 Explanation:</span>
+                      <span className="text-gray-700 ml-1">{currentResult.explanation}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => setCurrentResultIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentResultIndex === 0}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ← Previous
+              </button>
+
+              <div className="text-center">
+                <span className="text-sm text-gray-600 block">
+                  Question {currentResultIndex + 1} of {totalResults}
+                </span>
+                <span className="text-xs text-gray-400">
+                  Use ← → arrow keys to navigate
+                </span>
+              </div>
+
+              <button
+                onClick={() => setCurrentResultIndex(prev => Math.min(totalResults - 1, prev + 1))}
+                disabled={currentResultIndex === totalResults - 1}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => router.back()}
+                className="btn-primary"
+              >
+                Back to Course
+              </button>
+              <button
+                onClick={() => {
+                  setShowResults(false);
+                  setCurrentResultIndex(0);
+                  fetchQuizQuestions();
+                  setTimeElapsed(0);
+                }}
+                className="btn-secondary"
+              >
+                Retake Quiz
+              </button>
+            </div>
           </div>
         </div>
       </div>

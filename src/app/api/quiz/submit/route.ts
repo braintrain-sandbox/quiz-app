@@ -47,10 +47,15 @@ export async function POST(request: Request) {
       return {
         questionId: q.id,
         question: q.question,
+        optionA: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
         userAnswer,
         correctAnswer: q.correctAnswer,
         isCorrect,
         explanation: q.explanation,
+        difficulty: q.difficulty,
       };
     });
 
