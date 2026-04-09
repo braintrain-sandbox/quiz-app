@@ -7,6 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // User model with authentication
@@ -14,6 +15,7 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String    @unique
+  zohoContactId String?   @unique
   emailVerified DateTime?
   password      String?
   image         String?
@@ -25,6 +27,7 @@ model User {
   quizAttempts     QuizAttempt[]
   topicProgress    TopicProgress[]
   certificates     Certificate[]
+  payments         Payment[]
 
   @@map("users")
 }
@@ -76,6 +79,7 @@ model Course {
   topics          Topic[]
   quizAttempts    QuizAttempt[]
   certificates    Certificate[]
+  payments        Payment[]
 
   @@map("courses")
 }
@@ -131,6 +135,17 @@ enum Difficulty {
   EASY
   MEDIUM
   HARD
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum PaymentSource {
+  CHECKOUT
+  WEBHOOK
 }
 
 // Topic Progress tracking
@@ -190,4 +205,28 @@ model Certificate {
 
   @@index([userId])
   @@map("certificates")
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  userId      String
+  courseId    String
+  orderId     String        @unique
+  paymentId   String?       @unique
+  zohoInvoiceId String?     @unique
+  signature   String?
+  amount      Int
+  currency    String        @default("INR")
+  status      PaymentStatus @default(CREATED)
+  source      PaymentSource @default(CHECKOUT)
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, courseId, status])
+  @@index([courseId, status])
+  @@map("payments")
 }

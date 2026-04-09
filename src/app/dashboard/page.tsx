@@ -25,6 +25,12 @@ interface ProgressData {
   totalCertificates: number;
 }
 
+const EMPTY_PROGRESS: ProgressData = {
+  courses: [] as CourseProgress[],
+  totalQuizzesTaken: 0,
+  totalCertificates: 0,
+};
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -45,10 +51,27 @@ export default function DashboardPage() {
   const fetchProgress = async () => {
     try {
       const response = await fetch('/api/progress');
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/auth/signin');
+          return;
+        }
+
+        console.error('Failed to load progress:', response.status);
+        setProgress(EMPTY_PROGRESS);
+        return;
+      }
+
       const data = await response.json();
-      setProgress(data);
+      setProgress({
+        courses: Array.isArray(data?.courses) ? data.courses : [],
+        totalQuizzesTaken: Number(data?.totalQuizzesTaken ?? 0),
+        totalCertificates: Number(data?.totalCertificates ?? 0),
+      });
     } catch (error) {
       console.error('Error fetching progress:', error);
+      setProgress(EMPTY_PROGRESS);
     } finally {
       setLoading(false);
     }
@@ -65,17 +88,20 @@ export default function DashboardPage() {
   if (!progress) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center">Failed to load progress data</div>
+        <div className="text-center">No progress data yet</div>
       </div>
     );
   }
 
+  const courses = progress.courses ?? [];
   const totalProgress =
-    progress.courses.reduce((sum, c) => sum + c.progress, 0) / progress.courses.length || 0;
+    courses.length > 0 ? courses.reduce((sum, c) => sum + c.progress, 0) / courses.length : 0;
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">My Dashboard</h1>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold">My Dashboard</h1>
+      </div>
 
       {/* Overview Stats */}
       <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -86,7 +112,7 @@ export default function DashboardPage() {
 
         <div className="quiz-card bg-gradient-to-br from-green-50 to-green-100">
           <div className="text-3xl font-bold text-green-600 mb-2">
-            {progress.courses.reduce((sum, c) => sum + c.completedTopics, 0)}
+            {courses.reduce((sum, c) => sum + c.completedTopics, 0)}
           </div>
           <div className="text-sm text-gray-700">Topics Completed</div>
         </div>
@@ -110,7 +136,7 @@ export default function DashboardPage() {
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Course Progress</h2>
         <div className="space-y-4">
-          {progress.courses.map((course) => (
+          {courses.map((course) => (
             <div key={course.courseId} className="quiz-card">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
@@ -190,7 +216,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">My Certificates</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {progress.courses
+            {courses
               .filter((c) => c.hasCertificate)
               .map((course) => (
                 <div

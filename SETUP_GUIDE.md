@@ -5,6 +5,7 @@
 You now have a **fully functional AI Quiz Platform** with:
 
 ### ✅ Core Features Implemented
+
 - **3 AI Career Courses** (24 topics total)
 - **150+ MCQ Questions** with detailed explanations
 - **Strict Progression System** - unlock topics sequentially
@@ -14,6 +15,12 @@ You now have a **fully functional AI Quiz Platform** with:
 - **User Dashboard** - progress tracking across courses
 - **Authentication** - Email/password + Google OAuth
 - **Responsive UI** - mobile-friendly design
+
+### Razorpay Payments
+
+The course detail page now includes Razorpay checkout for paid unlocks. After a successful payment, the server verifies the signature, records the payment, and attempts to create and email a Zoho invoice.
+
+The amount sent to Razorpay is taken from the server-side `COURSE_PRICE_INR` setting. For sandbox testing, use Razorpay test keys. For real charges, switch to live keys and set `COURSE_PRICE_INR` to the actual amount you want customers charged.
 
 ---
 
@@ -35,7 +42,6 @@ Before starting, ensure you have:
 1. **Create Supabase Account**
    - Go to [https://supabase.com](https://supabase.com)
    - Sign up with GitHub/Google/Email
-   
 2. **Create New Project**
    - Click "New Project"
    - Name: "quiz-app" or any name you prefer
@@ -49,18 +55,17 @@ Before starting, ensure you have:
    - Select **URI** tab
    - Copy the connection string
    - Replace `[YOUR-PASSWORD]` with your actual password
-   
 4. **Important: Use Transaction Pooler for Prisma**
-   
+
    Supabase provides two connection options:
-   
+
    **Option 1: Transaction Pooler (Recommended)**
    - Port: `6543`
    - Format: `postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres`
    - Best for: Prisma ORM
-   
+
    **Option 2: Direct Connection with PgBouncer**
-   - Port: `5432` 
+   - Port: `5432`
    - Add `?pgbouncer=true&connection_limit=1` at the end
    - Format: `postgresql://postgres:[password]@db.xxxxx.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1`
 
@@ -69,12 +74,12 @@ Before starting, ensure you have:
 1. **Install PostgreSQL**
    - Download from [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
    - During installation, set password for `postgres` user
-   
 2. **Create Database**
+
    ```bash
    # Using psql
    createdb quiz_app
-   
+
    # Or via SQL
    psql -U postgres
    CREATE DATABASE quiz_app;
@@ -87,11 +92,13 @@ Before starting, ensure you have:
 
 ### Option C: Other Cloud Providers
 
-**Neon ([neon.tech](https://neon.tech))**: 
+**Neon ([neon.tech](https://neon.tech))**:
+
 - Free tier with 0.5GB storage
 - Copy connection string directly from dashboard
 
 **Railway ([railway.app](https://railway.app))**:
+
 - $5/month credit for free
 - PostgreSQL plugin provides connection string
 
@@ -128,16 +135,30 @@ NEXTAUTH_SECRET="your-generated-secret-here"
 # Optional: Google OAuth (leave as-is if not using Google sign-in)
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# Razorpay payment integration
+RAZORPAY_KEY_ID="your-razorpay-key-id"
+RAZORPAY_KEY_SECRET="your-razorpay-key-secret"
+NEXT_PUBLIC_RAZORPAY_KEY_ID="your-razorpay-key-id"
+COURSE_PRICE_INR="1495"
+
+# Zoho invoice integration
+ZOHO_CLIENT_ID="your-zoho-client-id"
+ZOHO_CLIENT_SECRET="your-zoho-client-secret"
+ZOHO_REFRESH_TOKEN="your-zoho-refresh-token"
+ZOHO_ORGANIZATION_ID="your-zoho-organization-id"
 ```
 
 3. **Generate `NEXTAUTH_SECRET`**:
 
 **Windows PowerShell:**
+
 ```powershell
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 **Linux/Mac:**
+
 ```bash
 openssl rand -base64 32
 ```
@@ -153,9 +174,12 @@ npm install
 ```
 
 This installs all required packages including:
+
 - Next.js, React, TypeScript
 - Prisma ORM + Client
 - NextAuth + Prisma Adapter
+- Razorpay for paid course unlocks
+- Zoho Invoice for payment invoicing
 - Redux Toolkit
 - TailwindCSS
 - bcryptjs for password hashing
@@ -178,6 +202,7 @@ npx tsx prisma/seed.ts
 ```
 
 **Expected Output:**
+
 ```
 ✅ Cleared existing data
 ✅ Seeded 3 courses
@@ -199,51 +224,52 @@ Open [http://localhost:3000](http://localhost:3000) in your browser 🎉
 ---
 
 ## 📁 Complete File Structure
+
 ├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── auth/[...nextauth]/route.ts ✅
-│   │   │   ├── auth/register/route.ts ✅
-│   │   │   ├── courses/route.ts ✅
-│   │   │   ├── courses/[courseId]/route.ts ✅
-│   │   │   ├── quiz/topic/[topicId]/route.ts ✅
-│   │   │   ├── quiz/final/[courseId]/route.ts ✅
-│   │   │   ├── quiz/submit/route.ts ✅
-│   │   │   └── progress/route.ts ✅
-│   │   ├── auth/
-│   │   │   ├── signin/page.tsx ✅
-│   │   │   └── signup/page.tsx ✅
-│   │   ├── courses/
-│   │   │   ├── page.tsx ✅
-│   │   │   └── [courseSlug]/page.tsx ✅
-│   │   ├── quiz/
-│   │   │   ├── [topicId]/page.tsx ✅
-│   │   │   └── final/[courseId]/page.tsx ✅
-│   │   ├── dashboard/page.tsx ✅
-│   │   ├── layout.tsx ✅
-│   │   ├── globals.css ✅
-│   │   └── page.tsx ✅ (Homepage)
-│   ├── components/
-│   │   ├── Navbar.tsx ✅
-│   │   └── Providers.tsx ✅
-│   ├── store/
-│   │   ├── store.ts ✅
-│   │   └── slices/
-│   │       ├── quizSlice.ts ✅
-│   │       └── userSlice.ts ✅
-│   ├── lib/
-│   │   ├── prisma.ts ✅
-│   │   └── auth.ts ✅
-│   ├── types/index.ts ✅
-│   └── middleware.ts ✅
+│ ├── app/
+│ │ ├── api/
+│ │ │ ├── auth/[...nextauth]/route.ts ✅
+│ │ │ ├── auth/register/route.ts ✅
+│ │ │ ├── courses/route.ts ✅
+│ │ │ ├── courses/[courseId]/route.ts ✅
+│ │ │ ├── quiz/topic/[topicId]/route.ts ✅
+│ │ │ ├── quiz/final/[courseId]/route.ts ✅
+│ │ │ ├── quiz/submit/route.ts ✅
+│ │ │ └── progress/route.ts ✅
+│ │ ├── auth/
+│ │ │ ├── signin/page.tsx ✅
+│ │ │ └── signup/page.tsx ✅
+│ │ ├── courses/
+│ │ │ ├── page.tsx ✅
+│ │ │ └── [courseSlug]/page.tsx ✅
+│ │ ├── quiz/
+│ │ │ ├── [topicId]/page.tsx ✅
+│ │ │ └── final/[courseId]/page.tsx ✅
+│ │ ├── dashboard/page.tsx ✅
+│ │ ├── layout.tsx ✅
+│ │ ├── globals.css ✅
+│ │ └── page.tsx ✅ (Homepage)
+│ ├── components/
+│ │ ├── Navbar.tsx ✅
+│ │ └── Providers.tsx ✅
+│ ├── store/
+│ │ ├── store.ts ✅
+│ │ └── slices/
+│ │ ├── quizSlice.ts ✅
+│ │ └── userSlice.ts ✅
+│ ├── lib/
+│ │ ├── prisma.ts ✅
+│ │ └── auth.ts ✅
+│ ├── types/index.ts ✅
+│ └── middleware.ts ✅
 ├── prisma/
-│   ├── schema.prisma ✅
-│   ├── seed.ts ✅
-│   └── data/
-│       ├── courses.ts ✅
-│       ├── questions-marketing.ts ✅
-│       ├── questions-data-analyst.ts ✅
-│       └── questions-product-strategist.ts ✅
+│ ├── schema.prisma ✅
+│ ├── seed.ts ✅
+│ └── data/
+│ ├── courses.ts ✅
+│ ├── questions-marketing.ts ✅
+│ ├── questions-data-analyst.ts ✅
+│ └── questions-product-strategist.ts ✅
 ├── package.json ✅
 ├── next.config.js ✅
 ├── tsconfig.json ✅
@@ -252,19 +278,22 @@ Open [http://localhost:3000](http://localhost:3000) in your browser 🎉
 ├── .env.example ✅
 ├── .gitignore ✅
 └── README.md ✅
-```
+
+````
 
 ## 🔧 Installation Steps
 
 ### 1. Install Dependencies
 ```bash
 npm install
-```
+````
 
 ### 2. Set up PostgreSQL Database
+
 You need a PostgreSQL database. Choose one option:
 
 #### Option A: Local PostgreSQL
+
 ```bash
 # Install PostgreSQL if not already installed
 # Windows: Download from https://www.postgresql.org/download/windows/
@@ -279,12 +308,14 @@ createdb quiz_db
 ```
 
 #### Option B: Use Neon (Free Cloud PostgreSQL)
+
 1. Go to https://neon.tech
 2. Sign up for free account
 3. Create a new project
 4. Copy the connection string
 
 ### 3. Configure Environment Variables
+
 Create a `.env` file in the root directory:
 
 ```env
@@ -304,6 +335,7 @@ GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
 #### Generate NEXTAUTH_SECRET:
+
 ```bash
 # On Mac/Linux:
 openssl rand -base64 32
@@ -315,6 +347,7 @@ openssl rand -base64 32
 ```
 
 ### 4. Set up Database Schema
+
 ```bash
 # Generate Prisma client
 npx prisma generate
@@ -324,6 +357,7 @@ npx prisma db push
 ```
 
 ### 5. Seed Database with Content
+
 ```bash
 # Populate database with courses, topics, and questions
 npx tsx prisma/seed.ts
@@ -332,6 +366,7 @@ npx tsx prisma/seed.ts
 If you see "✅ Database seeded successfully" - you're ready!
 
 ### 6. Run Development Server
+
 ```bash
 npm run dev
 ```
@@ -391,24 +426,26 @@ Open http://localhost:3000 in your browser 🎉
 **Solutions:**
 
 1. **Supabase Users:**
+
    ```env
    # Try Transaction Pooler (port 6543)
    DATABASE_URL="postgresql://postgres.xxxxx:password@aws-0-region.pooler.supabase.com:6543/postgres"
-   
+
    # OR add pgbouncer parameter (port 5432)
    DATABASE_URL="postgresql://postgres:password@db.xxxxx.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1"
    ```
-   
+
    - Check if Supabase project is paused (free tier pauses after inactivity)
    - Go to your Supabase dashboard and wake it up
    - Verify password has no unescaped special characters
 
 2. **Local PostgreSQL:**
+
    ```bash
    # Check if PostgreSQL is running
    # Windows: Open Services app, look for "postgresql"
    # Mac: brew services list
-   
+
    # Test connection manually
    psql -U postgres -d quiz_app
    ```
@@ -420,6 +457,7 @@ Open http://localhost:3000 in your browser 🎉
 **Problem:** Missing dependency
 
 **Solution:**
+
 ```bash
 npm install @next-auth/prisma-adapter
 ```
@@ -433,6 +471,7 @@ This package is required for NextAuth to work with Prisma.
 **Problem:** Wrong command syntax
 
 **Solution:**
+
 ```bash
 # Wrong:
 npx db push
@@ -450,6 +489,7 @@ All Prisma commands need the `prisma` keyword.
 **Problem:** Schema issues or old Prisma client
 
 **Solution:**
+
 ```bash
 # Clean and regenerate
 npx prisma generate
@@ -463,6 +503,7 @@ npx prisma db push
 **Problem:** Another app is using port 3000
 
 **Solution:**
+
 ```bash
 # Use a different port
 npm run dev -- -p 3001
@@ -477,6 +518,7 @@ npm run dev -- -p 3001
 **Problem:** TypeScript compilation issues
 
 **Solution:**
+
 ```bash
 # Delete build cache and node_modules
 rm -rf .next node_modules
@@ -496,6 +538,7 @@ npm run dev
 **Problem:** Invalid NEXTAUTH_SECRET or URL
 
 **Solution:**
+
 ```bash
 # Check your .env file:
 # 1. NEXTAUTH_SECRET must be at least 32 characters
@@ -515,6 +558,7 @@ NEXTAUTH_URL="http://localhost:3000"
 **Problem:** Database constraints or existing data
 
 **Solution:**
+
 ```bash
 # Reset and reseed
 npx prisma db push --force-reset
@@ -525,6 +569,7 @@ npx tsx prisma/seed.ts
 ⚠️ Warning: `--force-reset` deletes ALL data!
 
 ### Google OAuth Not Working
+
 - Make sure you've set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
 - Check redirect URI in Google Console is: http://localhost:3000/api/auth/callback/google
 - If not using Google, just skip it - email/password works fine!
@@ -532,12 +577,15 @@ npx tsx prisma/seed.ts
 ## 📊 Database Management
 
 ### View Database in Prisma Studio (GUI)
+
 ```bash
 npx prisma studio
 ```
+
 Opens at http://localhost:5555 - browse all tables visually
 
 ### Reset Database
+
 ```bash
 # WARNING: Deletes all data!
 npx prisma db push --force-reset
@@ -545,12 +593,15 @@ npx tsx prisma/seed.ts
 ```
 
 ### Add More Questions
+
 Edit files in `prisma/data/`:
+
 - `questions-marketing.ts`
 - `questions-data-analyst.ts`
 - `questions-product-strategist.ts`
 
 Then re-seed:
+
 ```bash
 npx tsx prisma/seed.ts
 ```
@@ -558,6 +609,7 @@ npx tsx prisma/seed.ts
 ## 🚢 Deploying to Production
 
 ### Option 1: Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -572,6 +624,7 @@ vercel
 ```
 
 ### Option 2: Docker
+
 ```bash
 # Build
 docker build -t quiz-app .
@@ -581,7 +634,9 @@ docker run -p 3000:3000 --env-file .env quiz-app
 ```
 
 ### Production Environment Variables
+
 Update NEXTAUTH_URL to your production domain:
+
 ```env
 NEXTAUTH_URL="https://your-domain.com"
 ```
@@ -597,11 +652,13 @@ NEXTAUTH_URL="https://your-domain.com"
 ## 📈 Next Steps / Future Enhancements
 
 ### Immediate Priorities:
+
 1. ✅ **Test complete user flow** (signup → quiz → certificate)
 2. ✅ **Verify lock/unlock logic** works correctly
 3. ✅ **Check responsive design** on mobile devices
 
 ### Future Features:
+
 - [ ] **Expand Question Bank** - currently 150+ questions, target is 960-1920
 - [ ] PDF Certificate Download
 - [ ] Email notifications (quiz completion, certificate earned)
@@ -614,6 +671,7 @@ NEXTAUTH_URL="https://your-domain.com"
 - [ ] Video explanations for questions
 
 ### Performance Optimizations:
+
 - [ ] Implement Redis caching for course data
 - [ ] Add image optimization for course thumbnails
 - [ ] Lazy load question components
@@ -622,6 +680,7 @@ NEXTAUTH_URL="https://your-domain.com"
 ## 💡 Tips
 
 ### Development Workflow:
+
 ```bash
 # Terminal 1: Run dev server
 npm run dev
@@ -634,12 +693,14 @@ npx tsx prisma/seed.ts
 ```
 
 ### Quick Database Reset During Development:
+
 ```bash
 # One-liner to reset and reseed
 npx prisma db push --force-reset && npx tsx prisma/seed.ts
 ```
 
 ### Debugging Tips:
+
 - Check browser console for frontend errors
 - Check terminal logs for backend/API errors
 - Use Prisma Studio to verify database state
@@ -648,6 +709,7 @@ npx prisma db push --force-reset && npx tsx prisma/seed.ts
 ## 📞 Getting Help
 
 If you encounter issues:
+
 1. Check console logs (browser + terminal)
 2. Verify `.env` configuration
 3. Try resetting database
@@ -664,7 +726,7 @@ If you encounter issues:
 ✅ **Lock/Unlock Logic** - Strict sequential progression  
 ✅ **Certificate Generation** - Auto-issued for 70%+ scores  
 ✅ **Dashboard** - Complete progress overview  
-✅ **Responsive Design** - Works on all devices  
+✅ **Responsive Design** - Works on all devices
 
 **You have a production-ready MVP!** 🚀
 

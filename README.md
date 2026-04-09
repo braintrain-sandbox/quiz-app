@@ -49,7 +49,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - PostgreSQL database (local or cloud: Supabase/Neon/Railway)
 - npm or yarn package manager
 - Google OAuth credentials (optional, for Google sign-in)
@@ -57,68 +57,75 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd quiz-app
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
-   
+
    Create a `.env` file in the root directory:
+
    ```env
    # Local PostgreSQL
    DATABASE_URL="postgresql://username:password@localhost:5432/quiz_db"
-   
+
    # OR Supabase (add pgbouncer parameter)
    DATABASE_URL="postgresql://postgres:password@db.xxxxx.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1"
-   
+
    # OR Supabase Transaction Pooler (port 6543)
    DATABASE_URL="postgresql://postgres.xxxxx:password@aws-0-region.pooler.supabase.com:6543/postgres"
-   
+
    NEXTAUTH_SECRET="your-secret-key-here"
    NEXTAUTH_URL="http://localhost:3000"
-   
+
    # Optional: Google OAuth
    GOOGLE_CLIENT_ID="your-google-client-id"
    GOOGLE_CLIENT_SECRET="your-google-client-secret"
    ```
 
    Generate a secure secret for NEXTAUTH_SECRET:
-   
+
    **Linux/Mac:**
+
    ```bash
    openssl rand -base64 32
    ```
-   
+
    **Windows PowerShell:**
+
    ```powershell
    node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
    ```
 
 4. **Set up the database**
+
    ```bash
    # Generate Prisma client
    npx prisma generate
-   
+
    # Push schema to database
    npx prisma db push
-   
+
    # Seed the database with courses, topics, and questions
    npx tsx prisma/seed.ts
    ```
 
 5. **Run the development server**
+
    ```bash
    npm run dev
    ```
 
 6. **Open your browser**
-   
+
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
@@ -201,16 +208,41 @@ quiz-app/
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/register` | POST | User registration |
-| `/api/auth/[...nextauth]` | * | NextAuth handlers |
-| `/api/courses` | GET | List all courses |
-| `/api/courses/[courseId]` | GET | Course details with lock status |
-| `/api/quiz/topic/[topicId]` | GET | Fetch topic quiz questions |
-| `/api/quiz/final/[courseId]` | GET | Fetch final quiz questions |
-| `/api/quiz/submit` | POST | Submit quiz answers |
-| `/api/progress` | GET | User progress across courses |
+| Endpoint                     | Method | Description                     |
+| ---------------------------- | ------ | ------------------------------- |
+| `/api/auth/register`         | POST   | User registration               |
+| `/api/auth/[...nextauth]`    | \*     | NextAuth handlers               |
+| `/api/courses`               | GET    | List all courses                |
+| `/api/courses/[courseId]`    | GET    | Course details with lock status |
+| `/api/quiz/topic/[topicId]`  | GET    | Fetch topic quiz questions      |
+| `/api/quiz/final/[courseId]` | GET    | Fetch final quiz questions      |
+| `/api/quiz/submit`           | POST   | Submit quiz answers             |
+| `/api/progress`              | GET    | User progress across courses    |
+| `/api/payment/create-order`  | POST   | Create Razorpay order           |
+| `/api/payment/verify`        | POST   | Verify Razorpay signature       |
+| `/api/payment/webhook`       | POST   | Handle Razorpay webhook events  |
+
+## Razorpay Integration
+
+The paid course unlock flow uses Razorpay checkout on the course detail page. When a payment succeeds, the server verifies the signature, stores the payment record, and best-effort creates/emails the Zoho invoice.
+
+The checkout amount is decided on the server from `COURSE_PRICE_INR`, not from the browser. That means the frontend cannot change the price.
+
+Use Razorpay test keys for sandbox testing and live keys only when you are ready to accept real payments. The amount in `COURSE_PRICE_INR` should be the actual sale price you want charged in that environment.
+
+Required environment variables:
+
+- `RAZORPAY_KEY_ID`
+- `RAZORPAY_KEY_SECRET`
+- `NEXT_PUBLIC_RAZORPAY_KEY_ID`
+- `COURSE_PRICE_INR`
+- `RAZORPAY_WEBHOOK_SECRET` if you use Razorpay webhooks
+- `ZOHO_CLIENT_ID`
+- `ZOHO_CLIENT_SECRET`
+- `ZOHO_REFRESH_TOKEN`
+- `ZOHO_ORGANIZATION_ID`
+
+The checkout amount is configured in `COURSE_PRICE_INR`.
 
 ## Scripts
 
@@ -233,47 +265,62 @@ npx tsx prisma/seed.ts     # Reseed database
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `NEXTAUTH_SECRET` | Secret for JWT signing | Yes |
-| `NEXTAUTH_URL` | Application URL | Yes |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | No |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | No |
+| Variable                      | Description                                        | Required |
+| ----------------------------- | -------------------------------------------------- | -------- |
+| `DATABASE_URL`                | PostgreSQL connection string                       | Yes      |
+| `NEXTAUTH_SECRET`             | Secret for JWT signing                             | Yes      |
+| `NEXTAUTH_URL`                | Application URL                                    | Yes      |
+| `GOOGLE_CLIENT_ID`            | Google OAuth client ID                             | No       |
+| `GOOGLE_CLIENT_SECRET`        | Google OAuth client secret                         | No       |
+| `RAZORPAY_KEY_ID`             | Razorpay API key ID (server use)                   | No       |
+| `RAZORPAY_KEY_SECRET`         | Razorpay API key secret (server use)               | No       |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Razorpay key ID exposed to frontend checkout       | No       |
+| `COURSE_PRICE_INR`            | Checkout amount for course unlock in INR           | Yes      |
+| `RAZORPAY_WEBHOOK_SECRET`     | Razorpay webhook secret for signature verification | No       |
+| `ZOHO_CLIENT_ID`              | Zoho OAuth client ID                               | No       |
+| `ZOHO_CLIENT_SECRET`          | Zoho OAuth client secret                           | No       |
+| `ZOHO_REFRESH_TOKEN`          | Zoho refresh token                                 | No       |
+| `ZOHO_ORGANIZATION_ID`        | Zoho organization ID                               | No       |
 
 ## Troubleshooting
 
 ### Database Connection Issues
 
 **Local PostgreSQL:**
+
 - Verify PostgreSQL is running
 - Check DATABASE_URL format
 - Ensure database exists: `createdb quiz_db`
 
 **Supabase:**
+
 - Add `?pgbouncer=true&connection_limit=1` to connection string
 - Use Transaction Pooler (port 6543) instead of Direct Connection (port 5432)
 - Check if project is paused (free tier pauses after inactivity)
 - Verify password has no unescaped special characters
 
 **Error: Module not found '@next-auth/prisma-adapter':**
+
 ```bash
 npm install @next-auth/prisma-adapter
 ```
 
 ### Authentication Issues
+
 - Verify NEXTAUTH_SECRET is set and is a valid base64 string
 - Clear browser cookies and try again
 - Check Google OAuth credentials if using Google sign-in
 - Ensure NEXTAUTH_URL matches your actual URL
 
 ### Seeding Errors
+
 - Run `npx prisma generate` first
 - Then run `npx prisma db push`
 - Delete all data: `npx prisma db push --force-reset`
 - Re-run seed script: `npx tsx prisma/seed.ts`
 
 ### Build Errors
+
 - Delete `.next` folder and `node_modules`
 - Run `npm install` again
 - Run `npx prisma generate`
