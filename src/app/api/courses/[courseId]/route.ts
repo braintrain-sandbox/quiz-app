@@ -36,6 +36,15 @@ export async function GET(
 
     // Get user progress if logged in
     if (session?.user) {
+      const paidAccess = await prisma.payment.findFirst({
+        where: {
+          userId: session.user.id,
+          courseId,
+          status: 'PAID',
+        },
+        select: { id: true },
+      });
+
       const progress = await prisma.topicProgress.findMany({
         where: {
           userId: session.user.id,
@@ -72,12 +81,14 @@ export async function GET(
 
       // Check if all topics are completed for final quiz
       const allTopicsCompleted = topicsWithStatus.every((t) => t.isCompleted);
+      const hasPaidAccess = Boolean(paidAccess);
 
       return NextResponse.json({
         ...course,
         topics: topicsWithStatus,
+        hasPaidAccess,
         allTopicsCompleted,
-        canTakeFinalQuiz: allTopicsCompleted,
+        canTakeFinalQuiz: allTopicsCompleted && hasPaidAccess,
       });
     }
 

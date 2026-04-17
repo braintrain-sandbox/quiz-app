@@ -1,10 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { Difficulty, PrismaClient } from '@prisma/client';
 import { coursesData } from './data/courses';
 import marketingQuestions from './data/questions-marketing';
 import dataAnalystQuestions from './data/questions-data-analyst';
 import productStrategistQuestions from './data/questions-product-strategist';
 
 const prisma = new PrismaClient();
+
+function toDifficulty(value: string): Difficulty {
+  if (value === 'EASY' || value === 'MEDIUM' || value === 'HARD') {
+    return value;
+  }
+
+  return 'MEDIUM';
+}
 
 async function main() {
   console.log('🌱 Starting database seed...');
@@ -68,7 +76,7 @@ async function main() {
         optionD: question.optionD,
         correctAnswer: question.correctAnswer,
         explanation: question.explanation,
-        difficulty: question.difficulty,
+        difficulty: toDifficulty(question.difficulty),
         tags: question.tags,
         topicId: question.topicId,
         courseId: question.courseId,

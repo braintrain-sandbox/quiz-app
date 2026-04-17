@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import RazorpayCheckoutButton from '@/components/RazorpayCheckoutButton';
 
 interface Topic {
   id: string;
@@ -23,6 +24,7 @@ interface CourseDetails {
   title: string;
   description: string;
   topics: Topic[];
+  hasPaidAccess?: boolean;
   allTopicsCompleted?: boolean;
   canTakeFinalQuiz?: boolean;
 }
@@ -66,6 +68,11 @@ export default function CoursePage() {
       return;
     }
 
+    if (!course?.hasPaidAccess) {
+      alert('Please complete payment to unlock this course.');
+      return;
+    }
+
     if (!isUnlocked) {
       alert('Please complete the previous topic first');
       return;
@@ -77,6 +84,11 @@ export default function CoursePage() {
   const handleStartFinalQuiz = () => {
     if (!session) {
       router.push('/auth/signin');
+      return;
+    }
+
+    if (!course?.hasPaidAccess) {
+      alert('Please complete payment to unlock the final quiz.');
       return;
     }
 
@@ -118,11 +130,32 @@ export default function CoursePage() {
         </div>
       )}
 
+      {session && !course.hasPaidAccess && (
+        <div className="quiz-card border border-emerald-200 bg-emerald-50 mb-8">
+          <h2 className="text-xl font-semibold text-emerald-800 mb-2">Unlock Full Course Access</h2>
+          <p className="text-emerald-700 mb-4">Complete payment to unlock all topic quizzes and the final syllabus quiz for this course.</p>
+          <RazorpayCheckoutButton
+            courseId={course.id}
+            courseTitle={course.title}
+            userName={session.user?.name}
+            userEmail={session.user?.email}
+            onPaymentSuccess={fetchCourseDetails}
+          />
+        </div>
+      )}
+
+      {session && course.hasPaidAccess && (
+        <div className="quiz-card border border-green-200 bg-green-50 mb-8">
+          <h2 className="text-xl font-semibold text-green-800 mb-2">Payment Confirmed</h2>
+          <p className="text-green-700">Your access for this course is active.</p>
+        </div>
+      )}
+
       {/* Topics List */}
       <div className="space-y-4 mb-8">
         <h2 className="text-2xl font-semibold mb-4">Course Topics</h2>
         {course.topics.map((topic, index) => {
-          const isLocked = session ? !topic.isUnlocked : true;
+          const isLocked = session ? !topic.isUnlocked || !course.hasPaidAccess : true;
           
           return (
             <div

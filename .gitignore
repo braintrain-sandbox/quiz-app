@@ -29,12 +29,15 @@ yarn-error.log*
 .env
 .env*.local
 
+# payment / local secret exports
+rzp-key.csv
+
+# local debug scripts
+tmp-*.js
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
-# prisma
-prisma/migrations

@@ -17,10 +17,18 @@ export default function CoursesPage() {
   const fetchCourses = async () => {
     try {
       const response = await fetch('/api/courses');
+
+      if (!response.ok) {
+        console.error('Failed to fetch courses:', response.status);
+        setCourses([]);
+        return;
+      }
+
       const data = await response.json();
-      setCourses(data);
+      setCourses(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching courses:', error);
+      setCourses([]);
     } finally {
       setLoading(false);
     }
