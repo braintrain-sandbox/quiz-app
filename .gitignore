@@ -34,6 +34,17 @@ rzp-key.csv
 
 # local debug scripts
 tmp-*.js
+simple-test.js
+stats_test.js
+test-db.js
+build.log
+build_err.txt
+output.txt
+test.txt
+
+# Firebase service account keys
+*firebase-adminsdk*.json
+quiz-app-*-firebase-adminsdk-*.json
 
 # vercel
 .vercel

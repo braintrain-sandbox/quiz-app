@@ -164,8 +164,8 @@ export default function HomePage() {
         <section className="text-center bg-primary-600 text-white rounded-lg p-12">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your AI Career?</h2>
           <p className="text-xl mb-6">Join thousands learning AI skills through our quiz platform</p>
-          <Link href="/auth/signup" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
-            Sign Up Now - It's Free
+            <Link href="/auth/signup" className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
+            Sign Up Now - It&apos;s Free
           </Link>
         </section>
       )}

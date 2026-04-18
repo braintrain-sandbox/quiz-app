@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { getRazorpayInstance } from '@/lib/razorpay';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const runtime = 'nodejs';
 
 // POST /api/payment/create-order - Create a Razorpay order for checkout

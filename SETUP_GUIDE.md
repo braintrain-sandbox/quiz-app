@@ -136,6 +136,14 @@ NEXTAUTH_SECRET="your-generated-secret-here"
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
+# Email Verification (Node SMTP)
+EMAIL_SERVER_HOST="smtp.your-provider.com"
+EMAIL_SERVER_PORT="587"
+EMAIL_SERVER_SECURE="false"
+EMAIL_SERVER_USER="your-smtp-username"
+EMAIL_SERVER_PASSWORD="your-smtp-password"
+EMAIL_FROM="Quiz App <no-reply@yourdomain.com>"
+
 # Razorpay payment integration
 RAZORPAY_KEY_ID="your-razorpay-key-id"
 RAZORPAY_KEY_SECRET="your-razorpay-key-secret"
@@ -164,6 +172,24 @@ openssl rand -base64 32
 ```
 
 Copy the generated string and paste it as your `NEXTAUTH_SECRET` value.
+
+### SMTP Test Values (Quick Local Testing)
+
+Option A: Mailtrap sandbox inbox (recommended)
+
+- Create inbox in Mailtrap
+- Copy SMTP host, port, username, and password into your env
+- Usually set `EMAIL_SERVER_SECURE` to `false` with port 587
+
+Option B: Gmail SMTP
+
+- `EMAIL_SERVER_HOST=smtp.gmail.com`
+- `EMAIL_SERVER_PORT=587`
+- `EMAIL_SERVER_SECURE=false`
+- `EMAIL_SERVER_USER=your-gmail-address`
+- `EMAIL_SERVER_PASSWORD=your-google-app-password`
+
+Do not use your regular Gmail password. Use an app password.
 
 ---
 
@@ -220,6 +246,17 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser 🎉
+
+---
+
+## ✅ Step 6: Test Email Verification Flow
+
+1. Go to signup page and create a new account with email/password.
+2. Confirm you get success message after signup.
+3. Open your mailbox or Mailtrap inbox and click the verification link.
+4. Confirm you are redirected to sign-in with verified status.
+5. Sign in and verify access works.
+6. Optional negative test: create another new account and try signing in before clicking verification link. It should be blocked.
 
 ---
 

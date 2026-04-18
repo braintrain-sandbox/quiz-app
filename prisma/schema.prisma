@@ -22,12 +22,14 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts         Account[]
-  sessions         Session[]
-  quizAttempts     QuizAttempt[]
-  topicProgress    TopicProgress[]
-  certificates     Certificate[]
-  payments         Payment[]
+  accounts                  Account[]
+  sessions                  Session[]
+  emailVerificationTokens   EmailVerificationToken[]
+  passwordResetTokens       PasswordResetToken[]
+  quizAttempts              QuizAttempt[]
+  topicProgress             TopicProgress[]
+  certificates              Certificate[]
+  payments                  Payment[]
 
   @@map("users")
 }
@@ -64,6 +66,32 @@ model Session {
   @@map("sessions")
 }
 
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
 // Course model
 model Course {
   id          String   @id @default(cuid())
@@ -73,15 +101,52 @@ model Course {
   imageUrl    String?
   order       Int      @default(0)
   isActive    Boolean  @default(true)
+  
+  // New: Complete curriculum metadata from JSON
+  duration    String?      // e.g., "10 weeks"
+  mode        String?      // e.g., "Self Learning + Execution Lab + Mentor Validations"
+  programOverview Json?    // Stores objective, forWho, keyOutcomes, mentorRole
+  capstone    Json?        // Stores objective, requirements, deliverables, evaluationCriteria
+  industryExposure Json?   // Stores industries, datasets, dashboard expectations
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   topics          Topic[]
+  curriculumWeeks CurriculumWeek[]
   quizAttempts    QuizAttempt[]
   certificates    Certificate[]
   payments        Payment[]
 
   @@map("courses")
+}
+
+// CurriculumWeek model - structurally maps weeks to topics
+model CurriculumWeek {
+  id          String   @id @default(cuid())
+  weekNumber  Int
+  title       String
+  courseId    String
+  topicId     String?  // Links to topic if applicable
+  
+  // Detailed week curriculum
+  coreObjectives Json?      // Array of objectives
+  conceptsCovered Json?      // Array of concepts
+  practicalImplementation Json? // Array of implementations
+  weeklyDeliverable Json?    // Array of deliverables
+  mentorValidation Json?     // Array of validation points
+  evaluationCheckpoint String? @db.Text
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topic  Topic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  @@unique([courseId, weekNumber])
+  @@index([weekNumber])
+  @@map("curriculum_weeks")
 }
 
 // Topic model
@@ -99,6 +164,7 @@ model Topic {
   course          Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
   questions       Question[]
   topicProgress   TopicProgress[]
+  curriculumWeeks CurriculumWeek[]
 
   @@unique([slug, courseId])
   @@map("topics")

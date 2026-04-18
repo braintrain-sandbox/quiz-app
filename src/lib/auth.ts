@@ -37,19 +37,24 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Email and password required');
         }
 
+        const email = credentials.email.trim().toLowerCase();
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email },
         });
 
         if (!user || !user.password) {
-          throw new Error('Invalid credentials');
+          throw new Error('Invalid email or password');
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-
         if (!isPasswordValid) {
-          throw new Error('Invalid credentials');
+          throw new Error('Invalid email or password');
         }
+
+        // Email verification is NOT required to sign in
+        // User can sign in even if they haven't verified email yet
+        // But they'll see a prompt to verify email after login
 
         return {
           id: user.id,

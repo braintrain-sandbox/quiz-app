@@ -4,6 +4,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const runtime = 'nodejs';
 
 type PaymentVerificationOutcome = 'payment_only' | 'invoice_created' | 'invoice_emailed' | 'already_verified';
@@ -422,18 +424,37 @@ export async function POST(request: Request) {
       },
     });
 
-    let zohoInvoiceId: string | null = existingPayment.zohoInvoiceId;
-    let zohoWarning: string | null = null;
-    let invoiceStatus: PaymentVerificationOutcome = 'payment_only';
-    let invoiceMessage = 'Payment verified successfully';
+    // ⚡ OPTIMIZATION: Return success immediately without waiting for Zoho operations
+    // Zoho invoice creation runs in background (fire-and-forget) to keep payment unlock instant
+    const immediateResponse = {
+      success: true,
+      message: 'Payment verified successfully. Course unlocked!',
+      invoiceStatus: 'payment_only' as PaymentVerificationOutcome,
+      payment_id,
+      order_id,
+    };
 
-    // Zoho invoice creation is best-effort and must not break payment success response.
-    try {
-      const zohoEnv = getZohoEnv();
-      if (!zohoEnv) {
-        zohoWarning = 'Zoho is not fully configured';
-        invoiceMessage = 'Payment verified successfully';
-      } else {
+    // Start Zoho operations in the background WITHOUT awaiting
+    // This ensures the course unlocks immediately for the user
+    (async () => {
+      try {
+        const zohoEnv = getZohoEnv();
+        if (!zohoEnv) {
+          console.warn('Zoho is not fully configured, skipping invoice generation');
+          return;
+        }
+
+        // Check if invoice already exists (idempotency)
+        const latestPayment = await prisma.payment.findUnique({
+          where: { orderId: order_id },
+          select: { zohoInvoiceId: true },
+        });
+
+        if (latestPayment?.zohoInvoiceId) {
+          console.log('Invoice already exists for payment:', order_id);
+          return;
+        }
+
         const accessToken = await getZohoAccessToken(zohoEnv);
         const userEmail = existingPayment.user.email;
 
@@ -451,91 +472,53 @@ export async function POST(request: Request) {
           userEmail,
         });
 
-        // Idempotency check before creating invoice for the same payment_id.
-        const latestPayment = await prisma.payment.findUnique({
-          where: { orderId: order_id },
-          select: { zohoInvoiceId: true },
+        const amountInInr = existingPayment.currency === 'INR'
+          ? Number((existingPayment.amount / 100).toFixed(2))
+          : existingPayment.amount;
+
+        const itemName = `${existingPayment.course.title} Course Purchase`;
+        const invoice = await createInvoice({
+          accessToken,
+          organizationId: zohoEnv.organizationId,
+          customerId,
+          itemName,
+          amountInInr,
         });
 
-        if (latestPayment?.zohoInvoiceId) {
-          zohoInvoiceId = latestPayment.zohoInvoiceId;
-          invoiceStatus = 'invoice_emailed';
-          invoiceMessage = 'Invoice already exists and payment was verified successfully';
-        } else {
-          const amountInInr = existingPayment.currency === 'INR'
-            ? Number((existingPayment.amount / 100).toFixed(2))
-            : existingPayment.amount;
+        // Save invoice ID
+        await prisma.payment.update({
+          where: { orderId: order_id },
+          data: { zohoInvoiceId: invoice.invoiceId },
+        });
 
-          const itemName = `${existingPayment.course.title} Course Purchase`;
-          const invoice = await createInvoice({
+        // Send email (non-blocking)
+        try {
+          await emailInvoice({
             accessToken,
             organizationId: zohoEnv.organizationId,
-            customerId,
-            itemName,
-            amountInInr,
+            invoiceId: invoice.invoiceId,
+            recipientEmail: userEmail,
           });
-
-          invoiceStatus = 'invoice_created';
-          invoiceMessage = 'Invoice created successfully';
-
-          try {
-            await emailInvoice({
-              accessToken,
-              organizationId: zohoEnv.organizationId,
-              invoiceId: invoice.invoiceId,
-              recipientEmail: userEmail,
-            });
-
-            invoiceStatus = 'invoice_emailed';
-            invoiceMessage = 'Invoice emailed successfully';
-          } catch (emailError) {
-            console.error('Zoho invoice email failed after invoice creation:', {
-              orderId: order_id,
-              paymentId: payment_id,
-              invoiceId: invoice.invoiceId,
-              recipientEmail: userEmail,
-              error: emailError,
-            });
-            zohoWarning = 'Payment verified, but Zoho invoice email failed';
-            invoiceMessage = 'Invoice created successfully';
-          }
-
-          await prisma.payment.updateMany({
-            where: {
-              orderId: order_id,
-              zohoInvoiceId: null,
-            },
-            data: {
-              zohoInvoiceId: invoice.invoiceId,
-            },
+          console.log('✅ Invoice emailed successfully for payment:', order_id);
+        } catch (emailError) {
+          console.error('Zoho invoice email failed:', {
+            orderId: order_id,
+            paymentId: payment_id,
+            invoiceId: invoice.invoiceId,
+            recipientEmail: userEmail,
+            error: emailError,
           });
-
-          const withInvoice = await prisma.payment.findUnique({
-            where: { orderId: order_id },
-            select: { zohoInvoiceId: true },
-          });
-
-          zohoInvoiceId = withInvoice?.zohoInvoiceId || invoice.invoiceId;
         }
+      } catch (zohoError) {
+        console.error('Zoho integration failed in background:', {
+          orderId: order_id,
+          paymentId: payment_id,
+          error: zohoError,
+        });
       }
-    } catch (zohoError) {
-      zohoWarning = 'Payment verified, but Zoho invoice creation failed';
-      console.error('Zoho integration failed after payment verification:', {
-        orderId: order_id,
-        paymentId: payment_id,
-        error: zohoError,
-      });
-    }
+    })();
 
-    return NextResponse.json({
-      success: true,
-      message: invoiceMessage,
-      invoiceStatus,
-      payment_id,
-      order_id,
-      zohoInvoiceId,
-      warning: zohoWarning,
-    });
+    return NextResponse.json(immediateResponse);
   } catch (error) {
     console.error('Error verifying Razorpay payment:', error);
     return NextResponse.json(

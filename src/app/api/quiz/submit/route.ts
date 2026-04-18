@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/quiz/submit - Submit quiz answers
 export async function POST(request: Request) {
   try {
@@ -17,6 +19,124 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { topicId, courseId, answers, timeTaken, isFinalQuiz, questionIds } = body;
+
+    if (!courseId || typeof courseId !== 'string') {
+      return NextResponse.json(
+        { error: 'courseId is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!answers || typeof answers !== 'object') {
+      return NextResponse.json(
+        { error: 'answers payload is required' },
+        { status: 400 }
+      );
+    }
+
+    const paidAccess = await prisma.payment.findFirst({
+      where: {
+        userId: session.user.id,
+        courseId,
+        status: 'PAID',
+      },
+      select: { id: true },
+    });
+
+    if (!paidAccess) {
+      return NextResponse.json(
+        { error: 'Payment required to submit quiz' },
+        { status: 403 }
+      );
+    }
+
+    if (isFinalQuiz) {
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: {
+          topics: {
+            where: { isActive: true },
+            select: { id: true },
+          },
+        },
+      });
+
+      if (!course) {
+        return NextResponse.json(
+          { error: 'Course not found' },
+          { status: 404 }
+        );
+      }
+
+      const topicProgress = await prisma.topicProgress.findMany({
+        where: {
+          userId: session.user.id,
+          courseId,
+          isCompleted: true,
+        },
+        select: { topicId: true },
+      });
+
+      const completedTopicIds = new Set(topicProgress.map((item) => item.topicId));
+      const allTopicsCompleted = course.topics.every((topic) => completedTopicIds.has(topic.id));
+
+      if (!allTopicsCompleted) {
+        return NextResponse.json(
+          { error: 'All topics must be completed before submitting final quiz' },
+          { status: 403 }
+        );
+      }
+    } else {
+      if (!topicId || typeof topicId !== 'string') {
+        return NextResponse.json(
+          { error: 'topicId is required for topic quiz submission' },
+          { status: 400 }
+        );
+      }
+
+      const topic = await prisma.topic.findUnique({
+        where: { id: topicId },
+        include: {
+          course: {
+            include: {
+              topics: {
+                where: { isActive: true },
+                orderBy: { order: 'asc' },
+                select: { id: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (!topic || topic.courseId !== courseId) {
+        return NextResponse.json(
+          { error: 'Topic not found for this course' },
+          { status: 404 }
+        );
+      }
+
+      const topicIndex = topic.course.topics.findIndex((t) => t.id === topicId);
+      if (topicIndex > 0) {
+        const previousTopicId = topic.course.topics[topicIndex - 1].id;
+        const previousProgress = await prisma.topicProgress.findUnique({
+          where: {
+            userId_topicId: {
+              userId: session.user.id,
+              topicId: previousTopicId,
+            },
+          },
+          select: { isCompleted: true },
+        });
+
+        if (!previousProgress?.isCompleted) {
+          return NextResponse.json(
+            { error: 'Previous topic must be completed before submitting this quiz' },
+            { status: 403 }
+          );
+        }
+      }
+    }
 
     // Get questions to calculate score
     let questions;
