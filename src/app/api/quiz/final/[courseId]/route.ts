@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/quiz/final/[courseId] - Get final quiz questions for a course
 export async function GET(
   request: Request,
@@ -38,6 +40,22 @@ export async function GET(
       );
     }
 
+    const paidAccess = await prisma.payment.findFirst({
+      where: {
+        userId: session.user.id,
+        courseId,
+        status: 'PAID',
+      },
+      select: { id: true },
+    });
+
+    if (!paidAccess) {
+      return NextResponse.json(
+        { error: 'Payment required to access final quiz' },
+        { status: 403 }
+      );
+    }
+
     // Check completion status of all topics
     const topicProgress = await prisma.topicProgress.findMany({
       where: {
@@ -70,7 +88,6 @@ export async function GET(
         optionB: true,
         optionC: true,
         optionD: true,
-        correctAnswer: true,
         explanation: true,
         difficulty: true,
         tags: true,

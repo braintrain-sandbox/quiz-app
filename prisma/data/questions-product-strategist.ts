@@ -147,4 +147,140 @@ export const productStrategistQuestions = [
   },
 ];
 
-export default productStrategistQuestions;
+const additionalBusinessAutomationQuestions = [
+  // Week 7 business automation mapped to advanced automation topics
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "What is workflow mining?",
+    optionA: "Extracting money from workflows",
+    optionB: "Analyzing event logs to discover real process flow and bottlenecks",
+    optionC: "Only database mining",
+    optionD: "Creating workflows from scratch",
+    correctAnswer: "B",
+    explanation: "Workflow mining reveals actual process behavior from system event data.",
+    difficulty: "EASY",
+    tags: ["week-7", "workflow mining", "process analysis"]
+  },
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "Why is bot performance monitoring important?",
+    optionA: "Bots never fail",
+    optionB: "To track failure rates, execution time, and automation reliability",
+    optionC: "It slows systems",
+    optionD: "It is optional",
+    correctAnswer: "B",
+    explanation: "Monitoring detects degraded automations before business impact grows.",
+    difficulty: "EASY",
+    tags: ["week-7", "rpa", "monitoring"]
+  },
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "A classification bot is 92% accurate but expensive errors remain. Is this acceptable?",
+    optionA: "Always yes",
+    optionB: "Depends on error cost and tolerance in that workflow",
+    optionC: "Always no",
+    optionD: "Only speed matters",
+    correctAnswer: "B",
+    explanation: "Accuracy must be evaluated against business impact of wrong outcomes.",
+    difficulty: "MEDIUM",
+    tags: ["week-7", "quality", "risk"]
+  },
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "Process mining shows a delay at one approval step. What should be done first?",
+    optionA: "Delete the step",
+    optionB: "Perform root-cause analysis before automating",
+    optionC: "Add random reviewers",
+    optionD: "Ignore it",
+    correctAnswer: "B",
+    explanation: "Automation of a broken step preserves the same bottleneck.",
+    difficulty: "MEDIUM",
+    tags: ["week-7", "optimization", "root-cause"]
+  },
+  {
+    topicId: "topic-3-7",
+    courseId: "course-3",
+    question: "If misclassified documents still all go to humans, what design issue exists?",
+    optionA: "Accuracy too low only",
+    optionB: "Missing confidence-threshold routing strategy",
+    optionC: "OCR is impossible",
+    optionD: "Humans should be removed",
+    correctAnswer: "B",
+    explanation: "Confidence-based routing enables true partial automation gains.",
+    difficulty: "HARD",
+    tags: ["week-7", "confidence", "human-in-loop"]
+  },
+
+  // Week 8 business automation strategy mapped to governance topics
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "What is an automation roadmap?",
+    optionA: "Office map",
+    optionB: "Prioritized automation plan aligned with business goals",
+    optionC: "Only past project list",
+    optionD: "A technical diagram",
+    correctAnswer: "B",
+    explanation: "A roadmap sequences initiatives by impact, feasibility, and timing.",
+    difficulty: "EASY",
+    tags: ["week-8", "roadmap", "strategy"]
+  },
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "What is the ROI formula for automation?",
+    optionA: "Savings / Time",
+    optionB: "(Annual savings - implementation cost) / implementation cost x 100",
+    optionC: "Revenue minus payroll",
+    optionD: "Bots per month",
+    correctAnswer: "B",
+    explanation: "ROI should include full implementation and recurring operating costs.",
+    difficulty: "EASY",
+    tags: ["week-8", "roi", "finance"]
+  },
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "A project saves 200k yearly and costs 500k. How should decision be made?",
+    optionA: "Reject immediately",
+    optionB: "Evaluate payback period and strategic value before deciding",
+    optionC: "Accept always",
+    optionD: "Ignore maintenance cost",
+    correctAnswer: "B",
+    explanation: "Capital decisions depend on payback, risk, and long-term fit.",
+    difficulty: "MEDIUM",
+    tags: ["week-8", "payback", "decision-making"]
+  },
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "How should an automation team scale with many requests?",
+    optionA: "Approve everything",
+    optionB: "Use governance, reusable components, and prioritization",
+    optionC: "Only hire more people",
+    optionD: "Stop intake",
+    correctAnswer: "B",
+    explanation: "Scaling comes from standards and reusable architecture, not only headcount.",
+    difficulty: "MEDIUM",
+    tags: ["week-8", "scaling", "governance"]
+  },
+  {
+    topicId: "topic-3-8",
+    courseId: "course-3",
+    question: "With 100 projects and capacity for 10 per year, what is best approach?",
+    optionA: "Oldest-first always",
+    optionB: "Prioritize by ROI and build reusable patterns to increase throughput",
+    optionC: "Randomly choose",
+    optionD: "Cancel automation",
+    correctAnswer: "B",
+    explanation: "Portfolio optimization is essential when demand exceeds delivery capacity.",
+    difficulty: "HARD",
+    tags: ["week-8", "portfolio", "prioritization"]
+  }
+];
+
+export default [...productStrategistQuestions, ...additionalBusinessAutomationQuestions];

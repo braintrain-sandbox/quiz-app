@@ -244,7 +244,7 @@ export default function DashboardPage() {
         <div className="mt-8 quiz-card bg-gradient-to-r from-primary-600 to-purple-600 text-white">
           <h3 className="text-xl font-semibold mb-2">Keep Going! 💪</h3>
           <p className="text-primary-100">
-            You're {totalProgress.toFixed(0)}% through your AI career journey. Complete more topics
+            You&apos;re {totalProgress.toFixed(0)}% through your AI career journey. Complete more topics
             to unlock final quizzes and earn certificates!
           </p>
         </div>

@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const verified = searchParams.get('verified') === '1';
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +27,13 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        if (result.error.includes('verify your email')) {
+          setError('Please verify your email before signing in. Check your inbox and click the verification link.');
+        } else if (result.error.includes('EMAIL_NOT_VERIFIED')) {
+          setError('Please verify your email before signing in.');
+        } else {
+          setError('Invalid email or password');
+        }
       } else {
         router.push('/dashboard');
       }
@@ -48,6 +56,9 @@ export default function SignInPage() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
+            If you just signed up, please verify your email first before signing in.
+          </p>
+          <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <Link href="/auth/signup" className="font-medium text-primary-600 hover:text-primary-500">
               create a new account
@@ -56,6 +67,12 @@ export default function SignInPage() {
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow-md">
+          {verified && (
+            <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+              Email verified successfully. You can sign in now.
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
@@ -93,6 +110,11 @@ export default function SignInPage() {
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
                 placeholder="Enter your password"
               />
+              <div className="text-right mt-2">
+                <Link href="/auth/forgot-password" className="text-sm text-primary-600 hover:text-primary-500 font-medium">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <div>
@@ -146,5 +168,13 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <SignInForm />
+    </Suspense>
   );
 }

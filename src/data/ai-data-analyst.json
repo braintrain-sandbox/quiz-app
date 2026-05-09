@@ -1,0 +1,355 @@
+{
+  "courseId": "data-analyst",
+  "slug": "ai-data-analyst",
+  "title": "AI Data Analyst for Industry",
+  "duration": "10 weeks",
+  "mode": "Self Learning + Execution Lab + Mentor Validations",
+  "programOverview": {
+    "objective": "Train engineers to convert business data into decision intelligence—cleaning, modeling, forecasting, and dashboarding with deployable reporting pipelines.",
+    "forWho": ["Junior data analysts and BI engineers", "Business analysts upskilling for analytics roles", "Developers moving into analytics or data engineering tasks"],
+    "keyOutcomes": [
+      "Build robust data ingestion and cleaning pipelines",
+      "Create feature-engineered datasets for modeling and forecasting",
+      "Deploy dashboards and scheduled reporting that inform business actions",
+      "Produce a deployment-ready capstone demonstrating measurable KPI improvements"
+    ],
+    "mentorRole": {
+      "description": "Mentors will:",
+      "responsibilities": [
+        "Review dataset interpretation and business mapping",
+        "Validate model choices and evaluation metrics",
+        "Provide pipeline debugging and production-readiness guidance",
+        "Simulate stakeholder Q&A for final presentations"
+      ]
+    }
+  },
+  "curriculum": [
+    {
+      "week": 1,
+      "title": "Python for Business Analytics & Data Foundations",
+      "coreObjectives": [
+        "Understand data lifecycle in business environments",
+        "Perform structured exploratory data analysis (EDA)",
+        "Build reproducible analytics workflows"
+      ],
+      "conceptsCovered": [
+        "Data ingestion (CSV, APIs, databases)",
+        "Pandas operations & transformations",
+        "Visualization fundamentals",
+        "Structured notebook documentation",
+        "Data storytelling basics"
+      ],
+      "practicalImplementation": [
+        "Load real-world dataset",
+        "Perform EDA",
+        "Identify anomalies and trends",
+        "Create summary visualizations"
+      ],
+      "weeklyDeliverable": [
+        "Clean EDA notebook",
+        "Executive summary (1–2 page insight brief)"
+      ],
+      "mentorValidation": [
+        "Validate interpretation accuracy",
+        "Challenge assumptions in conclusions",
+        "Ensure business alignment"
+      ],
+      "evaluationCheckpoint": "Insights must connect to measurable business impact."
+    },
+    {
+      "week": 2,
+      "title": "Data Cleaning & Transformation Engineering",
+      "coreObjectives": [
+        "Build reliable data pipelines",
+        "Handle missing, inconsistent, and noisy data",
+        "Apply feature transformation logic"
+      ],
+      "conceptsCovered": [
+        "Missing data strategies",
+        "Outlier detection",
+        "Feature scaling & encoding",
+        "Data validation checks",
+        "Data versioning basics"
+      ],
+      "practicalImplementation": [
+        "Build cleaning pipeline script",
+        "Log transformations",
+        "Compare before/after quality metrics"
+      ],
+      "weeklyDeliverable": [
+        "Clean dataset",
+        "Data quality report",
+        "Transformation documentation"
+      ],
+      "mentorValidation": [
+        "Review transformation logic",
+        "Verify reproducibility"
+      ],
+      "evaluationCheckpoint": "Pipeline must be reusable and documented."
+    },
+    {
+      "week": 3,
+      "title": "KPI Architecture & Business Intelligence Mapping",
+      "coreObjectives": [
+        "Map operational metrics to strategic KPIs",
+        "Design decision-support metric hierarchies",
+        "Understand revenue, efficiency, and risk indicators"
+      ],
+      "conceptsCovered": [
+        "Leading vs lagging indicators",
+        "Metric trees",
+        "KPI dependency mapping",
+        "Industry-specific KPI selection"
+      ],
+      "practicalImplementation": [
+        "Build KPI architecture for selected industry",
+        "Link metrics to dataset fields"
+      ],
+      "weeklyDeliverable": [
+        "KPI design document",
+        "Metric-to-data mapping table"
+      ],
+      "mentorValidation": [
+        "Business logic challenge",
+        "Ensure KPI relevance"
+      ],
+      "evaluationCheckpoint": "KPIs must clearly influence decision-making."
+    },
+    {
+      "week": 4,
+      "title": "Dashboard Engineering & Executive Storytelling",
+      "coreObjectives": [
+        "Design executive-grade dashboards",
+        "Present insights clearly",
+        "Avoid misleading visualizations"
+      ],
+      "conceptsCovered": [
+        "Dashboard UX principles",
+        "Data visualization psychology",
+        "Drilldown logic",
+        "Narrative storytelling in analytics"
+      ],
+      "practicalImplementation": [
+        "Build interactive dashboard (Streamlit / PowerBI / Metabase)",
+        "Add filters and drilldowns"
+      ],
+      "weeklyDeliverable": [
+        "Live dashboard prototype",
+        "Storyboard explaining decision flow"
+      ],
+      "mentorValidation": [
+        "Visual clarity critique",
+        "Business usability review"
+      ],
+      "evaluationCheckpoint": "Dashboard must answer 3 core business questions clearly."
+    },
+    {
+      "week": 5,
+      "title": "Predictive Analytics for Business Forecasting",
+      "coreObjectives": [
+        "Implement regression & classification models",
+        "Select evaluation metrics aligned to business needs",
+        "Interpret model outputs"
+      ],
+      "conceptsCcovered": [
+        "Model training pipelines",
+        "Cross-validation",
+        "Overfitting detection",
+        "Feature importance analysis"
+      ],
+      "practicalImplementation": [
+        "Train model on real dataset",
+        "Compare baseline vs ML model",
+        "Evaluate using business metric (MAPE, F1, etc.)"
+      ],
+      "weeklyDeliverable": [
+        "Model notebook",
+        "Performance comparison report",
+        "Feature importance analysis"
+      ],
+      "mentorValidation": [
+        "Model selection review",
+        "Metric alignment check"
+      ],
+      "evaluationCheckpoint": "Model must outperform baseline."
+    },
+    {
+      "week": 6,
+      "title": "Data Automation & ETL Deployment",
+      "coreObjectives": [
+        "Automate data refresh processes",
+        "Build ETL scripts",
+        "Schedule analytics pipelines"
+      ],
+      "conceptsCovered": [
+        "ETL architecture",
+        "Cron/scheduler basics",
+        "Data logging",
+        "Error handling in pipelines"
+      ],
+      "practicalImplementation": [
+        "Build automated ETL script",
+        "Schedule periodic refresh",
+        "Log execution status"
+      ],
+      "weeklyDeliverable": [
+        "Automated pipeline script",
+        "Execution logs",
+        "Deployment documentation"
+      ],
+      "evaluationCheckpoint": "Pipeline must run unattended for test cycles."
+    },
+    {
+      "week": 7,
+      "title": "Real-time Analytics & Dashboarding",
+      "coreObjectives": [
+        "Build near real-time analytics systems",
+        "Implement streaming data pipelines",
+        "Monitor dashboard performance"
+      ],
+      "conceptsCovered": [
+        "Stream processing concepts",
+        "Message queues and event sourcing",
+        "Real-time visualization",
+        "Latency and throughput optimization"
+      ],
+      "practicalImplementation": [
+        "Build end-to-end streaming pipeline",
+        "Create real-time dashboard",
+        "Implement performance monitoring"
+      ],
+      "weeklyDeliverable": [
+        "Streaming pipeline code",
+        "Real-time dashboard demo",
+        "Performance metrics report"
+      ],
+      "evaluationCheckpoint": "Pipeline must process events in <2 second latency."
+    },
+    {
+      "week": 8,
+      "title": "Advanced Forecasting & Time-Series Modeling",
+      "coreObjectives": [
+        "Build sophisticated forecasting models",
+        "Handle seasonality and trends",
+        "Evaluate forecast accuracy"
+      ],
+      "conceptsCcovered": [
+        "ARIMA and exponential smoothing",
+        "Deep learning time-series models",
+        "Anomaly detection in sequences",
+        "Forecast confidence intervals"
+      ],
+      "practicalImplementation": [
+        "Implement multiple forecasting models",
+        "Compare forecast accuracy",
+        "Build confidence band analysis"
+      ],
+      "weeklyDeliverable": [
+        "Forecast comparison analysis",
+        "Model selection justification",
+        "Confidence interval documentation"
+      ],
+      "evaluationCheckpoint": "Forecast must achieve <15% MAPE on test set."
+    },
+    {
+      "week": 9,
+      "title": "Advanced Analytics & Causal Inference",
+      "coreObjectives": [
+        "Understand causal inference methods",
+        "Implement A/B testing frameworks",
+        "Evaluate business interventions"
+      ],
+      "conceptsCovered": [
+        "Causal graphs and DAGs",
+        "Propensity score matching",
+        "Difference-in-differences analysis",
+        "Experimentation best practices"
+      ],
+      "practicalImplementation": [
+        "Design A/B test framework",
+        "Implement causal analysis",
+        "Evaluate treatment effects"
+      ],
+      "weeklyDeliverable": [
+        "A/B testing framework documentation",
+        "Causal analysis report",
+        "Statistical power analysis"
+      ],
+      "evaluationCheckpoint": "Test design must control for confounders."
+    },
+    {
+      "week": 10,
+      "title": "Capstone Project & Production Deployment",
+      "coreObjectives": [
+        "Build end-to-end analytics solution",
+        "Deploy production-ready system",
+        "Document and present results"
+      ],
+      "conceptsCovered": [
+        "Project management and timeline planning",
+        "Documentation and code quality standards",
+        "Stakeholder communication",
+        "Production deployment best practices"
+      ],
+      "practicalImplementation": [
+        "Complete end-to-end analytics project",
+        "Deploy to production environment",
+        "Create presentation and documentation"
+      ],
+      "weeklyDeliverable": [
+        "Capstone project repository",
+        "Deployment documentation",
+        "Business impact memo"
+      ],
+      "evaluationCheckpoint": "Project must demonstrate measurable KPI improvement."
+    }
+  ],
+  "capstone": {
+    "objective": "Deliver an end-to-end analytics solution converting raw business data into actionable decisions with measurable KPI improvements.",
+    "requirements": [
+      "Clear business problem and KPI definition",
+      "Data pipeline (SQL + Python notebooks) and reproducible environment",
+      "Predictive or forecasting model with evaluation and baseline",
+      "Interactive dashboard and scheduled reporting",
+      "Business impact memo and deployment notes"
+    ],
+    "deliverables": [
+      "GitHub repository with code, datasets (sample/anonymized), and deployment instructions",
+      "Dashboard or hosted demo link (Streamlit/Metabase/PowerBI)",
+      "Business impact memo (1–2 pages) showing KPI delta and recommended actions",
+      "Mentor sign-off and stakeholder-ready slide deck"
+    ],
+    "evaluationCriteria": {
+      "dataPipelineRobustness": 25,
+      "modelPerformanceInterpretability": 30,
+      "dashboardClarityBusinessStorytelling": 25,
+      "deploymentReproducibilityDocs": 10,
+      "presentationStakeholderReadiness": 10
+    }
+  },
+  "industryExposure": {
+    "minimumIndustries": "Students must cover at least 3 industries",
+    "industries": [
+      "Retail & eCommerce",
+      "Manufacturing",
+      "Marketing / AdTech",
+      "Finance"
+    ],
+    "datasetRequirements": [
+      "Transactional or event-level logs (3–12 months)",
+      "Customer master and behavioral logs",
+      "Time-series with hourly/daily granularity for forecasting",
+      "Minimum two real or anonymized datasets per student/team"
+    ],
+    "dashboardAndAutomationExpectations": [
+      "Executive dashboard: top-line KPI, trend, and anomaly alerts",
+      "Drilldowns: cohort segmentation and funnel analysis",
+      "Scheduled automated reports (weekly/monthly) and exportable CSV outputs"
+    ],
+    "evaluationCheckpoints": [
+      "Data contract & quality checks approved by mentor",
+      "Model explainability notes (SHAP/LIME summaries) for stakeholders",
+      "Runbook for scheduled deliveries and data lineage"
+    ]
+  }
+}

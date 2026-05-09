@@ -89,6 +89,14 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
    # Optional: Google OAuth
    GOOGLE_CLIENT_ID="your-google-client-id"
    GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+   # Email Verification (Node SMTP)
+   EMAIL_SERVER_HOST="smtp.your-provider.com"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_SECURE="false"
+   EMAIL_SERVER_USER="your-smtp-username"
+   EMAIL_SERVER_PASSWORD="your-smtp-password"
+   EMAIL_FROM="Quiz App <no-reply@yourdomain.com>"
    ```
 
    Generate a secure secret for NEXTAUTH_SECRET:
@@ -272,6 +280,12 @@ npx tsx prisma/seed.ts     # Reseed database
 | `NEXTAUTH_URL`                | Application URL                                    | Yes      |
 | `GOOGLE_CLIENT_ID`            | Google OAuth client ID                             | No       |
 | `GOOGLE_CLIENT_SECRET`        | Google OAuth client secret                         | No       |
+| `EMAIL_SERVER_HOST`           | SMTP host for verification emails                  | Yes      |
+| `EMAIL_SERVER_PORT`           | SMTP port (587 for TLS, 465 for SSL)               | Yes      |
+| `EMAIL_SERVER_SECURE`         | `true` for SSL (usually 465), else `false`         | Yes      |
+| `EMAIL_SERVER_USER`           | SMTP username                                      | Yes      |
+| `EMAIL_SERVER_PASSWORD`       | SMTP password or app password                      | Yes      |
+| `EMAIL_FROM`                  | Sender address shown in verification email         | Yes      |
 | `RAZORPAY_KEY_ID`             | Razorpay API key ID (server use)                   | No       |
 | `RAZORPAY_KEY_SECRET`         | Razorpay API key secret (server use)               | No       |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Razorpay key ID exposed to frontend checkout       | No       |
@@ -311,6 +325,36 @@ npm install @next-auth/prisma-adapter
 - Clear browser cookies and try again
 - Check Google OAuth credentials if using Google sign-in
 - Ensure NEXTAUTH_URL matches your actual URL
+- For email/password signup, ensure SMTP variables are set and valid
+
+## Email Verification Testing
+
+Use one of the options below for local testing.
+
+1. Mailtrap (recommended for local testing)
+
+- Create a Mailtrap inbox and copy SMTP credentials
+- Set `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`, `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`
+- Set `EMAIL_SERVER_SECURE` to `false` for port 587
+- Set `EMAIL_FROM` to any sender format like `Quiz App <no-reply@example.com>`
+
+2. Gmail SMTP (personal testing)
+
+- Host: `smtp.gmail.com`
+- Port: `587`
+- Secure: `false`
+- User: your full Gmail address
+- Password: Gmail app password (not your normal account password)
+
+3. Verification flow test checklist
+
+- Start app with `npm run dev`
+- Open signup page and create a new account with a real email
+- Confirm success message appears after submit
+- Open mailbox (or Mailtrap inbox) and click verification link
+- Confirm redirect to sign-in with verified indicator
+- Sign in with same credentials and verify login succeeds
+- Try sign-in before verification on a fresh account and verify it is blocked
 
 ### Seeding Errors
 

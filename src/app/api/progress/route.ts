@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/progress - Get user progress across all courses
 export async function GET() {
   try {
@@ -80,9 +82,12 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching progress:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch progress' },
-      { status: 500 }
-    );
+
+    return NextResponse.json({
+      courses: [],
+      totalQuizzesTaken: 0,
+      totalCertificates: 0,
+      warning: 'Progress database is temporarily unavailable',
+    });
   }
 }

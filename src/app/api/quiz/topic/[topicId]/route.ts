@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/quiz/topic/[topicId] - Get quiz questions for a topic
 export async function GET(
   request: Request,
@@ -41,6 +43,22 @@ export async function GET(
       );
     }
 
+    const paidAccess = await prisma.payment.findFirst({
+      where: {
+        userId: session.user.id,
+        courseId: topic.courseId,
+        status: 'PAID',
+      },
+      select: { id: true },
+    });
+
+    if (!paidAccess) {
+      return NextResponse.json(
+        { error: 'Payment required to access this quiz' },
+        { status: 403 }
+      );
+    }
+
     // Check if topic is unlocked (previous topic completed)
     const topicIndex = topic.course.topics.findIndex((t) => t.id === topicId);
     
@@ -76,7 +94,6 @@ export async function GET(
         optionB: true,
         optionC: true,
         optionD: true,
-        correctAnswer: true,
         explanation: true,
         difficulty: true,
         tags: true,

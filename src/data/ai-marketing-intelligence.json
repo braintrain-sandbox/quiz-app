@@ -1,0 +1,287 @@
+{
+  "courseId": "marketing-intelligence",
+  "slug": "ai-marketing-intelligence",
+  "title": "AI Marketing Intelligence Professional",
+  "duration": "8 weeks",
+  "mode": "Self Learning + Campaign Lab + Mentor Strategy Validation",
+  "programOverview": {
+    "objective": "Train engineers to build AI-driven marketing decision systems: campaign intelligence, personalization, attribution, and social listening, with deployable automation and dashboards.",
+    "forWho": [
+      "Marketing analysts and growth managers",
+      "Data analysts focusing on marketing",
+      "Product owners at startups and SMEs seeking growth automation"
+    ],
+    "keyOutcomes": [
+      "Implement segmentation, recommendation and uplift models for campaigns",
+      "Automate content workflows and campaign scheduling",
+      "Build real-time/near-real-time marketing dashboards and campaign orchestration hooks",
+      "Deploy marketing automation that integrates with CRM / mail systems"
+    ],
+    "mentorRole": {
+      "description": "Mentors will:",
+      "responsibilities": [
+        "Validate campaign strategy and metrics",
+        "Critique content and AB test design",
+        "Ensure campaign systems are deployable and instrumented for measurement",
+        "Simulate marketing stakeholder Q&A"
+      ]
+    }
+  },
+  "curriculum": [
+    {
+      "week": 1,
+      "title": "Marketing Data Foundations & Funnel Intelligence",
+      "coreObjectives": [
+        "Understand customer journey stages",
+        "Analyze funnel drop-offs",
+        "Map metrics to campaign ROI"
+      ],
+      "conceptsCovered": [
+        "CAC, LTV, CTR, Conversion Rate",
+        "Funnel analytics",
+        "Cohort analysis",
+        "Attribution basics"
+      ],
+      "practicalImplementation": [
+        "Analyze campaign dataset",
+        "Identify funnel leakage",
+        "Build funnel visualization"
+      ],
+      "weeklyDeliverable": [
+        "Funnel analysis report",
+        "KPI mapping sheet"
+      ],
+      "mentorValidation": [
+        "Validate metric logic",
+        "Challenge interpretation assumptions"
+      ],
+      "evaluationCheckpoint": "Identify at least 2 actionable funnel improvements."
+    },
+    {
+      "week": 2,
+      "title": "AI Content Automation & Campaign Scripting",
+      "coreObjectives": [
+        "Use AI for campaign content generation",
+        "Build structured prompt frameworks",
+        "Optimize content performance"
+      ],
+      "conceptsCcovered": [
+        "Prompt optimization",
+        "Structured ad copy generation",
+        "Campaign scripting frameworks",
+        "Content testing variations"
+      ],
+      "practicalImplementation": [
+        "Create AI content templates",
+        "Generate multi-variant campaign copy"
+      ],
+      "weeklyDeliverable": [
+        "Content automation workflow",
+        "Performance hypothesis document"
+      ],
+      "mentorValidation": [
+        "Content optimization critique",
+        "Brand alignment review"
+      ],
+      "evaluationCheckpoint": "Content variations must show performance difference."
+    },
+    {
+      "week": 3,
+      "title": "Campaign Intelligence & A/B Automation",
+      "coreObjectives": [
+        "Automate experiment testing",
+        "Evaluate campaign performance",
+        "Implement attribution logic"
+      ],
+      "conceptsCcovered": [
+        "A/B test design",
+        "Statistical significance basics",
+        "Performance dashboards",
+        "Multi-touch attribution models"
+      ],
+      "practicalImplementation": [
+        "Build experiment plan",
+        "Simulate A/B results",
+        "Create performance dashboard"
+      ],
+      "weeklyDeliverable": [
+        "Campaign intelligence dashboard",
+        "A/B testing analysis report"
+      ],
+      "evaluationCheckpoint": "Test must show clear decision outcome."
+    },
+    {
+      "week": 4,
+      "title": "SEO Analytics & Social Sentiment AI",
+      "coreObjectives": [
+        "Analyze search performance",
+        "Implement sentiment analysis",
+        "Extract marketing insights from text data"
+      ],
+      "conceptsCcovered": [
+        "Keyword analytics",
+        "Search ranking metrics",
+        "Sentiment classification",
+        "Topic modelling"
+      ],
+      "practicalImplementation": [
+        "Build social listening pipeline",
+        "Generate sentiment dashboard"
+      ],
+      "weeklyDeliverable": [
+        "SEO performance summary",
+        "Social sentiment analytics dashboard"
+      ],
+      "mentorValidation": [
+        "Insight relevance",
+        "Brand positioning alignment"
+      ],
+      "evaluationCheckpoint": "Sentiment classification must achieve >85% accuracy."
+    },
+    {
+      "week": 5,
+      "title": "Customer Segmentation & Behavioral AI",
+      "coreObjectives": [
+        "Build clustering models",
+        "Predict customer behavior",
+        "Design segment-specific strategy"
+      ],
+      "conceptsCcovered": [
+        "RFM analysis",
+        "K-Means clustering",
+        "Propensity scoring",
+        "Segment-based targeting"
+      ],
+      "practicalImplementation": [
+        "Develop segmentation model",
+        "Define strategy for each cluster"
+      ],
+      "weeklyDeliverable": [
+        "Segmentation report",
+        "Segment strategy deck"
+      ],
+      "evaluationCheckpoint": "Each segment must have actionable marketing plan."
+    },
+    {
+      "week": 6,
+      "title": "Marketing Automation Architecture",
+      "coreObjectives": [
+        "Design cross-channel automation",
+        "Integrate CRM workflows",
+        "Implement trigger-based campaigns"
+      ],
+      "conceptsCcovered": [
+        "Email automation flows",
+        "CRM event triggers",
+        "Campaign orchestration logic",
+        "Automation KPIs"
+      ],
+      "practicalImplementation": [
+        "Create automation architecture diagram",
+        "Implement trigger-based mock system"
+      ],
+      "weeklyDeliverable": [
+        "Campaign automation blueprint",
+        "KPI monitoring sheet"
+      ],
+      "mentorValidation": [
+        "Architecture review",
+        "Scalability analysis"
+      ],
+      "evaluationCheckpoint": "System must handle >10k simultaneous users."
+    },
+    {
+      "week": 7,
+      "title": "Cross-Platform Campaign Deployment",
+      "coreObjectives": [
+        "Integrate multi-channel campaigns",
+        "Track cross-platform attribution",
+        "Optimize in near real-time"
+      ],
+      "conceptsCovered": [
+        "Multi-channel analytics",
+        "Channel attribution",
+        "Real-time optimization",
+        "Campaign lifecycle management"
+      ],
+      "practicalImplementation": [
+        "Build integrated campaign system",
+        "Connect dashboard with performance metrics"
+      ],
+      "weeklyDeliverable": [
+        "Campaign deployment demo",
+        "Performance analytics summary"
+      ],
+      "evaluationCheckpoint": "Demonstrate performance optimization logic."
+    },
+    {
+      "week": 8,
+      "title": "Capstone Project & Marketing System Deployment",
+      "coreObjectives": [
+        "Build end-to-end marketing intelligence system",
+        "Deploy production-ready automation",
+        "Document and present business impact"
+      ],
+      "conceptsCovered": [
+        "Project management for marketing tech",
+        "Stakeholder communication",
+        "Performance monitoring",
+        "Production deployment practices"
+      ],
+      "practicalImplementation": [
+        "Complete capstone marketing project",
+        "Deploy to production",
+        "Create business impact presentation"
+      ],
+      "weeklyDeliverable": [
+        "Capstone project repository",
+        "Deployment guide and monitoring dashboard",
+        "Campaign performance memo"
+      ],
+      "evaluationCheckpoint": "Project must show measurable CTR or conversion lift."
+    }
+  ],
+  "capstone": {
+    "objective": "Design and deploy a marketing intelligence system that measurably improves a campaign metric (CTR, conversion, LTV, retention) or demonstrates uplift via experiment simulation.",
+    "requirements": [
+      "Problem selection (personalization, attribution, uplift, social listening)",
+      "End-to-end pipeline: data ingestion → model → campaign integration → measurement",
+      "A/B test or uplift estimation plan and results (real or simulated)",
+      "Deployment plan for integration with CRM/marketing tool"
+    ],
+    "deliverables": [
+      "GitHub repo with code, data samples, and deployment notes",
+      "Campaign dashboard and measurement report",
+      "Slide deck & recorded demo suitable for recruiter/PM review"
+    ],
+    "evaluationCriteria": {
+      "businessImpactMeasurableUplift": 35,
+      "systemIntegrationDeploymentReadiness": 25,
+      "modelQualityInterpretability": 20,
+      "presentationStakeholderReadyDelivery": 20
+    }
+  },
+  "industryExposure": {
+    "minimumIndustries": "Students must cover at least 3 industries",
+    "industries": [
+      "E-commerce & Retail",
+      "Consumer Tech / SaaS",
+      "BFSI (credit/consumer product marketing)",
+      "Travel & Hospitality"
+    ],
+    "datasetRequirements": [
+      "Event streams (clicks, impressions, conversions), campaign metadata, customer profiles",
+      "Social media posts or reviews for NLP tasks",
+      "Minimum 3 months of event-level data; >100k events desirable for recommender tasks"
+    ],
+    "dashboardAndAutomationExpectations": [
+      "Campaign performance dashboard with cohort comparisons and attribution view",
+      "Exportable actionable segments and API for marketing automation",
+      "Anomaly alerts for sudden CTR/Conversion drops"
+    ],
+    "complianceAndPrivacy": [
+      "Consent-aware tracking design and cookieless strategies where applicable",
+      "Use anonymized or synthetic data for PII-sensitive demonstration"
+    ]
+  }
+}

@@ -1,0 +1,344 @@
+{
+  "courseId": "business-automation",
+  "slug": "ai-product-automation-strategist",
+  "title": "AI Business Automation Specialist",
+  "duration": "8 weeks",
+  "mode": "Hybrid (Self Learning + Mentor Validation + Execution Lab)",
+  "programOverview": {
+    "objective": "Train engineers to identify, design, build and deploy AI-driven automation systems that reduce manual effort and produce measurable business ROI.",
+    "forWho": [
+      "Automation engineers, developers, and solution architects",
+      "Business analysts transitioning to automation roles",
+      "Early-career engineers wanting practical automation experience"
+    ],
+    "keyOutcomes": [
+      "Map business processes and identify high-impact automation opportunities.",
+      "Build end-to-end automation workflows using no-code/low-code platforms, APIs, and RPA patterns.",
+      "Integrate Document AI, OCR, LLMs and standard ML models into automation pipelines.",
+      "Deploy automation with monitoring, KPI dashboards and runbooks.",
+      "Prepare employer-ready capstone deployment and demonstrate ROI."
+    ],
+    "mentorRole": {
+      "description": "Mentors will:",
+      "responsibilities": [
+        "Validate industry thinking and project selection.",
+        "Review project logic, architecture, and test plans.",
+        "Simulate employer-style questioning for capstone interviews.",
+        "Improve business communication (deliverables, memos, demo pitch).",
+        "Ensure projects meet deployable-quality standards (documentation, security, runbook)."
+      ]
+    }
+  },
+  "curriculum": [
+    {
+      "week": 1,
+      "title": "Business Process Intelligence & Automation Strategy",
+      "coreObjectives": [
+        "Understand operational architecture of SMEs and mid-sized enterprises",
+        "Differentiate between manual, rule-based, and AI-driven workflows",
+        "Identify high-impact automation opportunities",
+        "Calculate automation ROI and risk"
+      ],
+      "conceptsCovered": [
+        "AS-IS vs TO-BE process mapping",
+        "Bottleneck identification",
+        "Value vs complexity matrix",
+        "Cost of manual inefficiency",
+        "Automation feasibility scoring"
+      ],
+      "practicalImplementation": [
+        "Create detailed process flow diagram (Lucidchart / Miro)",
+        "Identify 3 automation candidates",
+        "Quantify impact (time saved, error reduction, cost saving)"
+      ],
+      "industryExamples": [
+        "Retail order fulfillment delays",
+        "BFSI onboarding verification",
+        "Manufacturing support ticket routing"
+      ],
+      "weeklyDeliverable": [
+        "5–8 page Process Intelligence Document including:",
+        "- Process map",
+        "- Bottleneck analysis",
+        "- ROI estimation sheet",
+        "- Automation prioritization matrix"
+      ],
+      "mentorValidation": [
+        "Challenge assumptions",
+        "Validate business logic",
+        "Simulate employer questioning"
+      ],
+      "evaluationCheckpoint": "Automation opportunity must show measurable business improvement."
+    },
+    {
+      "week": 2,
+      "title": "Prompt Engineering & AI Workflow Architecture",
+      "coreObjectives": [
+        "Design structured prompts for deterministic output",
+        "Implement multi-step AI workflows",
+        "Understand agent orchestration logic",
+        "Handle hallucination and edge cases"
+      ],
+      "conceptsCovered": [
+        "Role-based prompting",
+        "JSON structured output enforcement",
+        "Chain-of-thought orchestration",
+        "Agent tool usage patterns",
+        "Fallback and guardrail design"
+      ],
+      "practicalImplementation": [
+        "Build prompt library for:",
+        "- Classification",
+        "- Information extraction",
+        "- Decision summarization",
+        "Develop 2-step AI agent performing business task"
+      ],
+      "industryApplication": [
+        "Automated invoice categorization",
+        "Customer query classification",
+        "Compliance document summarization"
+      ],
+      "weeklyDeliverable": [
+        "Prompt Repository (minimum 10 production-ready prompts)",
+        "AI agent mini-workflow deployed as API or notebook demo"
+      ],
+      "mentorValidation": [
+        "Stress test prompts",
+        "Edge-case simulation",
+        "Output reliability review"
+      ],
+      "evaluationCheckpoint": "Output consistency ≥ defined threshold (manual validation sample test)."
+    },
+    {
+      "week": 3,
+      "title": "Workflow Automation & API Orchestration",
+      "coreObjectives": [
+        "Design automation workflows across tools",
+        "Understand event-driven architecture",
+        "Implement API authentication securely"
+      ],
+      "conceptsCcovered": [
+        "REST APIs",
+        "Webhooks",
+        "OAuth basics",
+        "Retry logic & idempotency",
+        "Error logging and monitoring"
+      ],
+      "practicalImplementation": [
+        "Connect automation platform with external API",
+        "Build trigger-based automation",
+        "Implement failure handling logic"
+      ],
+      "industryApplication": [
+        "CRM lead intake automation",
+        "Automated vendor validation flow",
+        "Customer escalation routing"
+      ],
+      "weeklyDeliverable": [
+        "Fully functional multi-service workflow",
+        "Integration documentation (setup + architecture diagram)"
+      ],
+      "mentorValidation": [
+        "Debug logic flaws",
+        "Evaluate scalability"
+      ],
+      "evaluationCheckpoint": "Workflow must run without manual intervention for test dataset."
+    },
+    {
+      "week": 4,
+      "title": "Document AI & Intelligent Processing",
+      "coreObjectives": [
+        "Implement OCR-based extraction",
+        "Build structured validation layers",
+        "Integrate AI into document workflows"
+      ],
+      "conceptsCcovered": [
+        "OCR architecture",
+        "Confidence scoring",
+        "Validation rules",
+        "Human-in-the-loop correction systems"
+      ],
+      "practicalImplementation": [
+        "Extract invoice data",
+        "Validate structured output",
+        "Flag anomalies"
+      ],
+      "industryApplication": [
+        "BFSI claims processing",
+        "Healthcare billing automation",
+        "Vendor invoice processing"
+      ],
+      "weeklyDeliverable": [
+        "Working document AI pipeline",
+        "Error rate analysis report",
+        "Exception handling workflow"
+      ],
+      "evaluationCheckpoint": "Accuracy benchmark defined and measured.",
+      "mentorReview": [
+        "Data accuracy",
+        "Compliance readiness"
+      ]
+    },
+    {
+      "week": 5,
+      "title": "CRM / ERP Automation Systems",
+      "coreObjectives": [
+        "Automate customer lifecycle events",
+        "Implement lead scoring logic",
+        "Design ERP-triggered automation"
+      ],
+      "conceptsCovered": [
+        "CRM workflow automation",
+        "Event-driven data updates",
+        "Customer scoring metrics",
+        "Lifecycle automation triggers"
+      ],
+      "practicalImplementation": [
+        "Integrate CRM mock API",
+        "Build lead scoring automation",
+        "Trigger automated email/notification"
+      ],
+      "weeklyDeliverable": [
+        "CRM automation demo",
+        "KPI impact mapping document",
+        "Architecture flow diagram"
+      ],
+      "evaluationCheckpoint": "Demonstrate measurable KPI improvement (simulation acceptable)."
+    },
+    {
+      "week": 6,
+      "title": "RPA & Low-Code Automation Platforms",
+      "coreObjectives": [
+        "Design RPA workflows",
+        "Use low-code platforms effectively",
+        "Build scalable automation solutions"
+      ],
+      "conceptsCcovered": [
+        "RPA concepts and limitations",
+        "UI automation patterns",
+        "Low-code platform capabilities",
+        "Automation governance"
+      ],
+      "practicalImplementation": [
+        "Build RPA workflow for repetitive task",
+        "Deploy on low-code platform",
+        "Monitor and scale automation"
+      ],
+      "weeklyDeliverable": [
+        "Production RPA workflow",
+        "Performance metrics and ROI analysis",
+        "Deployment checklist"
+      ],
+      "evaluationCheckpoint": "Automation must reduce manual effort by >50%."
+    },
+    {
+      "week": 7,
+      "title": "Monitoring, Alerting & Operational Runbooks",
+      "coreObjectives": [
+        "Build monitoring and alerting systems",
+        "Create operational runbooks",
+        "Implement SLA tracking and reporting"
+      ],
+      "conceptsCcovered": [
+        "Metrics and KPI definition",
+        "Alert design best practices",
+        "Runbook documentation",
+        "Incident response procedures"
+      ],
+      "practicalImplementation": [
+        "Build monitoring dashboard",
+        "Create alert rules and escalation",
+        "Document runbook procedures"
+      ],
+      "weeklyDeliverable": [
+        "Monitoring dashboard",
+        "Alert configuration documentation",
+        "Comprehensive operational runbook"
+      ],
+      "evaluationCheckpoint": "System must have <99.5% uptime SLA."
+    },
+    {
+      "week": 8,
+      "title": "Capstone Project & Production Deployment",
+      "coreObjectives": [
+        "Design and build end-to-end automation project",
+        "Deploy to production with full documentation",
+        "Present business impact and employer readiness"
+      ],
+      "conceptsCcovered": [
+        "Project management for automation",
+        "Security and compliance in automation",
+        "Stakeholder communication",
+        "Production deployment best practices"
+      ],
+      "practicalImplementation": [
+        "Complete end-to-end automation project",
+        "Deploy with monitoring and runbooks",
+        "Create business impact and demo materials"
+      ],
+      "weeklyDeliverable": [
+        "GitHub repo with complete code and tests",
+        "Live demo or recorded walkthrough",
+        "Architecture diagram and deployment guide",
+        "Business impact memo with ROI estimate"
+      ],
+      "evaluationCheckpoint": "Project must demonstrate >30% cost savings or time reduction."
+    }
+  ],
+  "capstone": {
+    "objective": "Design, build and deploy a production-grade automation for an enterprise process (examples: AP automation, customer onboarding, maintenance ticket automation).",
+    "requirements": [
+      "Problem statement + business case + KPIs (time saved, error reduction, cost saved)",
+      "End-to-end pipeline: ingestion → processing (AI/RPA) → execution → monitoring",
+      "Secure API/connectors, error handling, and idempotency",
+      "Dockerized components or clear infra-as-code / deployment steps",
+      "KPI dashboard and runbook for operations"
+    ],
+    "deliverables": [
+      "GitHub repo with code, tests, and deployment instructions",
+      "Live demo link or recorded walkthrough",
+      "Architecture diagram and component responsibilities",
+      "Business impact memo (1–2 pages) with ROI estimate",
+      "Mentor sign-off + mock employer Q&A summary"
+    ],
+    "evaluationCriteria": {
+      "functionalCompletenessStability": 40,
+      "deploymentDocumentationQuality": 20,
+      "businessImpactKPIs": 20,
+      "codeQualityTesting": 10,
+      "interviewReadinessDemo": 10
+    }
+  },
+  "industryExposure": {
+    "minimumIndustriesCovered": "Students must complete at least 3 industries",
+    "industries": [
+      "Retail",
+      "BFSI (Banking, Financial Services & Insurance)",
+      "Manufacturing",
+      "Healthcare",
+      "Logistics & Supply Chain"
+    ],
+    "datasetRequirements": [
+      "At least 2 real or realistic anonymized datasets (transaction logs, invoices, CRM exports, sensor logs)",
+      "6–12 months of transactional history preferred; ≥10k rows desirable",
+      "OCR document samples (invoices/receipts) for Document AI tasks",
+      "Mock API endpoints for CRM/ERP integrations"
+    ],
+    "automationDashboardExpectations": [
+      "At least one deployment-ready automation system (end-to-end)",
+      "KPI dashboard capturing:",
+      "- Throughput / jobs processed",
+      "- Error rate / exceptions",
+      "- Time saved per transaction",
+      "- Business metric impacted (e.g., reduction in handle time)",
+      "Runbook covering deployment, rollback, escalation, and SLA targets"
+    ],
+    "privacyCompliance": [
+      "Use anonymized or synthetic data for PII-sensitive tasks",
+      "Document consent & retention considerations"
+    ],
+    "mentorSignoff": [
+      "Mentor must validate: dataset adequacy, deployment steps, KPI mapping, and employer-style readiness"
+    ]
+  }
+}

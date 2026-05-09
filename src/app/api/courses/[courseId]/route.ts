@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { coursesData } from '../../../../../prisma/data/courses';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/courses/[courseId] - Get course details with progress
 export async function GET(
@@ -95,9 +98,31 @@ export async function GET(
     return NextResponse.json(course);
   } catch (error) {
     console.error('Error fetching course:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch course' },
-      { status: 500 }
-    );
+
+    const fallbackCourse = coursesData.find((c) => c.id === params.courseId);
+
+    if (!fallbackCourse) {
+      return NextResponse.json(
+        { error: 'Course not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      ...fallbackCourse,
+      isActive: true,
+      topics: fallbackCourse.topics.map((topic, index) => ({
+        ...topic,
+        isActive: true,
+        _count: { questions: 0 },
+        isCompleted: false,
+        isUnlocked: index === 0,
+        bestScore: 0,
+        attemptsCount: 0,
+      })),
+      hasPaidAccess: false,
+      allTopicsCompleted: false,
+      canTakeFinalQuiz: false,
+    });
   }
 }

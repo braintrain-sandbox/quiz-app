@@ -1,24 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setMessage('');
 
-    // Validation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -32,7 +31,6 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // Register user
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,23 +39,13 @@ export default function SignUpPage() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Auto sign in after registration
-        const result = await signIn('credentials', {
-          email,
-          password,
-          redirect: false,
-        });
-
-        if (result?.ok) {
-          router.push('/dashboard');
-        } else {
-          router.push('/auth/signin');
-        }
-      } else {
+      if (!response.ok) {
         setError(data.error || 'Failed to create account');
+        return;
       }
-    } catch (error) {
+
+      setMessage('Verification email sent. Please check your inbox and verify before sign in.');
+    } catch (err) {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -87,6 +75,12 @@ export default function SignUpPage() {
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+              {message}
             </div>
           )}
 
@@ -178,6 +172,7 @@ export default function SignUpPage() {
 
             <div className="mt-6">
               <button
+                type="button"
                 onClick={handleGoogleSignUp}
                 className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >

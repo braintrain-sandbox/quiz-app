@@ -22,7 +22,7 @@ interface FinalQuizResult {
   timeTaken: number;
   passed: boolean;
   certificateId?: string;
-  answers: Record<number, string>;
+  answers: Record<string, string>;
   questions: Question[];
 }
 
@@ -97,7 +97,7 @@ export default function FinalQuizPage() {
       }
 
       const data = await response.json();
-      setCourseName(data.courseName);
+      setCourseName(data.courseTitle || data.courseName || '');
       dispatch(startQuiz(data.questions));
     } catch (error) {
       console.error('Error fetching final quiz:', error);
@@ -217,7 +217,7 @@ export default function FinalQuizPage() {
 
   if (showResults && results) {
     const currentQuestion = results.questions[currentResultIndex];
-    const userAnswer = results.answers[currentResultIndex];
+    const userAnswer = results.answers[currentQuestion.id];
     const isCorrect = userAnswer === currentQuestion.correctAnswer;
     const totalQuestions = results.questions.length;
 
@@ -304,7 +304,7 @@ export default function FinalQuizPage() {
             <h3 className="font-semibold mb-3 text-sm">Questions</h3>
             <div className="grid grid-cols-5 gap-2 max-h-[500px] overflow-y-auto">
               {results.questions.map((question, index) => {
-                const qUserAnswer = results.answers[index];
+                const qUserAnswer = results.answers[question.id];
                 const qIsCorrect = qUserAnswer === question.correctAnswer;
                 
                 return (
