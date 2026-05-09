@@ -305,7 +305,19 @@ async function ensureZohoCustomer(args: {
   return updatedUser.zohoContactId;
 }
 
-// POST /api/payment/verify - Verify Razorpay payment signature
+/**
+ * POST /api/payment/verify
+ *
+ * Verifies a payment from either Razorpay or Cashfree.
+ * Routes to the correct provider based on the `provider` field stored in the
+ * Payment DB record (set at order creation time).
+ *
+ * Body (Razorpay):  { order_id, payment_id, razorpay_signature }
+ * Body (Cashfree):  { order_id, payment_id, provider: "cashfree" }
+ *
+ * On success: marks Payment as PAID and runs Zoho invoice in background.
+ * Idempotent: if Payment is already PAID with the same paymentId, returns 200 immediately.
+ */
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -314,28 +326,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { order_id, payment_id, razorpay_signature } = body as {
+    const body = await request.json() as {
       order_id?: string;
       payment_id?: string;
       razorpay_signature?: string;
+      provider?: string;
     };
 
-    if (!order_id || !payment_id || !razorpay_signature) {
+    const { order_id, payment_id } = body;
+    const razorpay_signature = body.razorpay_signature;
+
+    if (!order_id || !payment_id) {
       return NextResponse.json(
-        { error: 'Missing payment verification fields' },
-        { status: 400 }
+        { error: 'order_id and payment_id are required' },
+        { status: 400 },
       );
     }
 
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
-    if (!keySecret) {
-      return NextResponse.json(
-        { error: 'Razorpay secret key not configured' },
-        { status: 500 }
-      );
-    }
-
+    // Load the stored payment record to know which provider handled this order
     const existingPayment = await prisma.payment.findUnique({
       where: { orderId: order_id },
       select: {
@@ -346,63 +354,22 @@ export async function POST(request: Request) {
         zohoInvoiceId: true,
         amount: true,
         currency: true,
-        course: {
-          select: {
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        provider: true,
+        course: { select: { title: true } },
+        user: { select: { id: true, name: true, email: true } },
       },
     });
 
     if (!existingPayment) {
-      return NextResponse.json(
-        { error: 'Order not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     if (existingPayment.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const generatedSignature = createHmac('sha256', keySecret)
-      .update(`${order_id}|${payment_id}`)
-      .digest('hex');
-
-    const isValid = generatedSignature === razorpay_signature;
-
-    if (!isValid) {
-      await prisma.payment.update({
-        where: { orderId: order_id },
-        data: {
-          status: 'FAILED',
-          paymentId: payment_id,
-          signature: razorpay_signature,
-        },
-      });
-
-      return NextResponse.json(
-        { success: false, error: 'Invalid payment signature' },
-        { status: 400 }
-      );
-    }
-
-    // Idempotency: if this payment is already marked paid and has a Zoho invoice, return early.
-    if (
-      existingPayment.status === 'PAID' &&
-      existingPayment.paymentId === payment_id &&
-      existingPayment.zohoInvoiceId
-    ) {
+    // Idempotency guard: already verified → return silently
+    if (existingPayment.status === 'PAID' && existingPayment.paymentId === payment_id) {
       return NextResponse.json({
         success: true,
         message: 'Payment already verified',
@@ -413,19 +380,110 @@ export async function POST(request: Request) {
       });
     }
 
-    await prisma.payment.update({
-      where: { orderId: order_id },
-      data: {
-        status: 'PAID',
-        paymentId: payment_id,
-        signature: razorpay_signature,
-        paidAt: new Date(),
-        source: 'CHECKOUT',
-      },
-    });
+    // ── Determine which provider to use ──────────────────────────────────────
+    // Prefer the value stored in DB; fall back to the value sent by the client.
+    const providerName = existingPayment.provider || body.provider || 'razorpay';
 
-    // ⚡ OPTIMIZATION: Return success immediately without waiting for Zoho operations
-    // Zoho invoice creation runs in background (fire-and-forget) to keep payment unlock instant
+    let verificationPassed = false;
+
+    if (providerName === 'razorpay') {
+      // ── Razorpay: verify HMAC-SHA256 signature ────────────────────────────
+      if (!razorpay_signature) {
+        return NextResponse.json(
+          { error: 'razorpay_signature is required for Razorpay payments' },
+          { status: 400 },
+        );
+      }
+
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (!keySecret) {
+        return NextResponse.json(
+          { error: 'Razorpay secret key not configured' },
+          { status: 500 },
+        );
+      }
+
+      const generatedSignature = createHmac('sha256', keySecret)
+        .update(`${order_id}|${payment_id}`)
+        .digest('hex');
+
+      verificationPassed = generatedSignature === razorpay_signature;
+
+      if (!verificationPassed) {
+        await prisma.payment.update({
+          where: { orderId: order_id },
+          data: {
+            status: 'FAILED',
+            paymentId: payment_id,
+            signature: razorpay_signature,
+          },
+        });
+
+        return NextResponse.json(
+          { success: false, error: 'Invalid Razorpay payment signature' },
+          { status: 400 },
+        );
+      }
+
+      // Mark Razorpay payment as paid
+      await prisma.payment.update({
+        where: { orderId: order_id },
+        data: {
+          status: 'PAID',
+          paymentId: payment_id,
+          signature: razorpay_signature,
+          paidAt: new Date(),
+          source: 'CHECKOUT',
+        },
+      });
+    } else if (providerName === 'cashfree') {
+      // ── Cashfree: verify by fetching payment status from Cashfree API ──────
+      // Import here to avoid loading Cashfree code for Razorpay-only requests
+      const { CashfreeProvider } = await import('@/lib/payment/cashfree-provider');
+      const cashfreeProvider = new CashfreeProvider();
+
+      const result = await cashfreeProvider.verifyPayment({
+        orderId: order_id,
+        provider: 'cashfree',
+        paymentId: payment_id,
+      });
+
+      const realPaymentId = result.providerPaymentId || payment_id;
+
+      if (!verificationPassed) {
+        await prisma.payment.update({
+          where: { orderId: order_id },
+          data: { 
+            status: 'FAILED', 
+            // Only set paymentId if it's not a generic placeholder
+            paymentId: realPaymentId !== 'cashfree_pending' ? realPaymentId : undefined 
+          },
+        });
+
+        return NextResponse.json(
+          { success: false, error: result.message },
+          { status: 400 },
+        );
+      }
+
+      // Mark Cashfree payment as paid
+      await prisma.payment.update({
+        where: { orderId: order_id },
+        data: {
+          status: 'PAID',
+          paymentId: realPaymentId,
+          paidAt: new Date(),
+          source: 'CHECKOUT',
+        },
+      });
+    } else {
+      return NextResponse.json(
+        { error: `Unknown payment provider: ${providerName}` },
+        { status: 400 },
+      );
+    }
+
+    // ── Return success immediately; Zoho runs in the background ──────────────
     const immediateResponse = {
       success: true,
       message: 'Payment verified successfully. Course unlocked!',
@@ -434,8 +492,7 @@ export async function POST(request: Request) {
       order_id,
     };
 
-    // Start Zoho operations in the background WITHOUT awaiting
-    // This ensures the course unlocks immediately for the user
+    // ⚡ Fire-and-forget Zoho invoice creation so course unlocks instantly
     (async () => {
       try {
         const zohoEnv = getZohoEnv();
@@ -444,7 +501,7 @@ export async function POST(request: Request) {
           return;
         }
 
-        // Check if invoice already exists (idempotency)
+        // Idempotency: skip if invoice already created
         const latestPayment = await prisma.payment.findUnique({
           where: { orderId: order_id },
           select: { zohoInvoiceId: true },
@@ -472,9 +529,10 @@ export async function POST(request: Request) {
           userEmail,
         });
 
-        const amountInInr = existingPayment.currency === 'INR'
-          ? Number((existingPayment.amount / 100).toFixed(2))
-          : existingPayment.amount;
+        const amountInInr =
+          existingPayment.currency === 'INR'
+            ? Number((existingPayment.amount / 100).toFixed(2))
+            : existingPayment.amount;
 
         const itemName = `${existingPayment.course.title} Course Purchase`;
         const invoice = await createInvoice({
@@ -485,13 +543,11 @@ export async function POST(request: Request) {
           amountInInr,
         });
 
-        // Save invoice ID
         await prisma.payment.update({
           where: { orderId: order_id },
           data: { zohoInvoiceId: invoice.invoiceId },
         });
 
-        // Send email (non-blocking)
         try {
           await emailInvoice({
             accessToken,
@@ -520,10 +576,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(immediateResponse);
   } catch (error) {
-    console.error('Error verifying Razorpay payment:', error);
+    console.error('Error verifying payment:', error);
     return NextResponse.json(
       { error: 'Failed to verify payment' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
