@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import RazorpayCheckoutButton from '@/components/RazorpayCheckoutButton';
+import PaymentCheckoutButton from '@/components/PaymentCheckoutButton';
 
 interface Topic {
   id: string;
@@ -173,7 +173,7 @@ export default function CoursePage() {
         <div className="quiz-card border border-emerald-200 bg-emerald-50 mb-8">
           <h2 className="text-xl font-semibold text-emerald-800 mb-2">Unlock Full Course Access</h2>
           <p className="text-emerald-700 mb-4">Complete payment to unlock all topic quizzes and the final syllabus quiz for this course.</p>
-          <RazorpayCheckoutButton
+          <PaymentCheckoutButton
             courseId={course.id}
             courseTitle={course.title}
             userName={session.user?.name}

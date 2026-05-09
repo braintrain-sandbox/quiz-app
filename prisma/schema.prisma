@@ -274,20 +274,22 @@ model Certificate {
 }
 
 model Payment {
-  id          String        @id @default(cuid())
-  userId      String
-  courseId    String
-  orderId     String        @unique
-  paymentId   String?       @unique
-  zohoInvoiceId String?     @unique
-  signature   String?
-  amount      Int
-  currency    String        @default("INR")
-  status      PaymentStatus @default(CREATED)
-  source      PaymentSource @default(CHECKOUT)
-  paidAt      DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id            String        @id @default(cuid())
+  userId        String
+  courseId      String
+  orderId       String        @unique
+  paymentId     String?       @unique
+  zohoInvoiceId String?       @unique
+  signature     String?
+  amount        Int
+  currency      String        @default("INR")
+  /// Payment gateway used: "razorpay" | "cashfree"
+  provider      String        @default("razorpay")
+  status        PaymentStatus @default(CREATED)
+  source        PaymentSource @default(CHECKOUT)
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)

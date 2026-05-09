@@ -31,6 +31,8 @@ yarn-error.log*
 
 # payment / local secret exports
 rzp-key.csv
+APIKey.csv
+*.csv
 
 # local debug scripts
 tmp-*.js

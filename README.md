@@ -230,27 +230,46 @@ quiz-app/
 | `/api/payment/verify`        | POST   | Verify Razorpay signature       |
 | `/api/payment/webhook`       | POST   | Handle Razorpay webhook events  |
 
-## Razorpay Integration
+## Payment System (Multi-Gateway)
 
-The paid course unlock flow uses Razorpay checkout on the course detail page. When a payment succeeds, the server verifies the signature, stores the payment record, and best-effort creates/emails the Zoho invoice.
+The platform features an intelligent, multi-gateway payment system that automatically routes users to the appropriate provider based on their geographic location:
 
-The checkout amount is decided on the server from `COURSE_PRICE_INR`, not from the browser. That means the frontend cannot change the price.
+- **India (INR)**: Routed to **Razorpay**.
+- **International (USD, EUR, GBP, AUD, CAD)**: Routed to **Cashfree**.
 
-Use Razorpay test keys for sandbox testing and live keys only when you are ready to accept real payments. The amount in `COURSE_PRICE_INR` should be the actual sale price you want charged in that environment.
+### Key Features
+- **Auto-Currency Detection**: Uses the visitor's IP address to detect their country and display localized pricing before they click "Buy".
+- **Dynamic Routing**: A single "Buy" button adapts its behavior, loading either the Razorpay modal or the Cashfree SDK.
+- **Localized Pricing**: Supports fixed pricing for major currencies:
+  - 🇮🇳 INR: ₹1,495
+  - 🇺🇸 USD: $12
+  - 🇪🇺 EUR: €11
+  - 🇬🇧 GBP: £10
+  - 🇦🇺 AUD: $18
+  - 🇨🇦 CAD: $16
+- **Global Webhook Handling**: A unified webhook receiver (`/api/payment/webhook`) verifies authenticity regardless of the source.
+- **Unified DB Schema**: All transactions are tracked in a single `Payment` table with a `provider` flag.
 
+### Prerequisites & Setup
+
+#### Razorpay (India)
 Required environment variables:
-
-- `RAZORPAY_KEY_ID`
-- `RAZORPAY_KEY_SECRET`
+- `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`
 - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
 - `COURSE_PRICE_INR`
-- `RAZORPAY_WEBHOOK_SECRET` if you use Razorpay webhooks
-- `ZOHO_CLIENT_ID`
-- `ZOHO_CLIENT_SECRET`
+
+#### Cashfree (International)
+Get credentials at [Cashfree Merchant Dashboard](https://merchant.cashfree.com/merchants/pg):
+- `CASHFREE_APP_ID`
+- `CASHFREE_SECRET_KEY`
+- `CASHFREE_ENV` (sandbox/production)
+- `NEXT_PUBLIC_CASHFREE_ENV` (sandbox/production)
+
+#### Zoho Invoice Automation
+Both gateways are integrated with Zoho Invoice for automatic receipting.
+- `ZOHO_CLIENT_ID` / `ZOHO_CLIENT_SECRET`
 - `ZOHO_REFRESH_TOKEN`
 - `ZOHO_ORGANIZATION_ID`
-
-The checkout amount is configured in `COURSE_PRICE_INR`.
 
 ## Scripts
 
@@ -291,6 +310,10 @@ npx tsx prisma/seed.ts     # Reseed database
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Razorpay key ID exposed to frontend checkout       | No       |
 | `COURSE_PRICE_INR`            | Checkout amount for course unlock in INR           | Yes      |
 | `RAZORPAY_WEBHOOK_SECRET`     | Razorpay webhook secret for signature verification | No       |
+| `CASHFREE_APP_ID`             | Cashfree App ID (server use)                       | No       |
+| `CASHFREE_SECRET_KEY`         | Cashfree Secret Key (server use)                   | No       |
+| `CASHFREE_ENV`                | Cashfree environment (sandbox/production)          | No       |
+| `NEXT_PUBLIC_CASHFREE_ENV`    | Cashfree environment exposed to frontend           | No       |
 | `ZOHO_CLIENT_ID`              | Zoho OAuth client ID                               | No       |
 | `ZOHO_CLIENT_SECRET`          | Zoho OAuth client secret                           | No       |
 | `ZOHO_REFRESH_TOKEN`          | Zoho refresh token                                 | No       |
